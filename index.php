@@ -16,7 +16,6 @@
         background-position: center center;
         background-attachment: fixed;
     }
-    /* Ping Animation */
     #ping-icon {
         position: relative;
     }
@@ -37,6 +36,8 @@
         100% { transform: scale(2); opacity: 0; }
     }
     </style>
+    <!-- ping.js for browser-based ping -->
+    <script src="https://cdn.jsdelivr.net/gh/alfg/ping.js@0.2.2/dist/ping.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -49,8 +50,8 @@
                         <div class="text-center">
                             <h4><i class="fa fa-home"></i> Libernet Mod</h4>
                         </div>                        
-                    </div>					
-                    <div class="card-body">						
+                    </div>
+                    <div class="card-body">
                         <div class="card-body py-0 px-0">
 						<form @submit.prevent="runLibernet">
                             <div class="form-group form-row my-auto">
@@ -168,26 +169,21 @@
 <?php include("javascript.php"); ?>
 <script src="js/index.js"></script>
 
-<!-- WAN Info JavaScript (Dual Provider, with fallback) -->
+<!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
 <script>
+// WAN Info
 async function fetchWanInfo() {
     const ipElem = document.getElementById('wan-ip');
     const netElem = document.getElementById('wan-net');
     const countryElem = document.getElementById('wan-country');
     const btn = document.getElementById('refresh-wan-btn');
-
-    // Helper to set fields
     const setFields = (ip, isp, country) => {
         ipElem.textContent = ip || 'Unavailable';
         netElem.textContent = isp || 'Unavailable';
         countryElem.textContent = country || 'Unavailable';
     };
-
-    // Loading state
     if (btn) btn.disabled = true;
     setFields('Loading...', 'Loading...', 'Loading...');
-
-    // Try ip-api.com first
     try {
         const resp1 = await fetch('http://ip-api.com/json/');
         if (!resp1.ok) throw new Error('ip-api.com unavailable');
@@ -197,11 +193,7 @@ async function fetchWanInfo() {
             if (btn) btn.disabled = false;
             return;
         }
-    } catch (e) {
-        // Continue to fallback
-    }
-
-    // Fallback: ipapi.is (no API key required)
+    } catch (e) {}
     try {
         const resp2 = await fetch('https://api.ipapi.is/?q=');
         if (!resp2.ok) throw new Error('ipapi.is unavailable');
@@ -218,42 +210,28 @@ async function fetchWanInfo() {
     }
 }
 
-// Ping Logic
-async function pingServer(url, timeout = 3000) {
-    const start = performance.now();
-    let controller = new AbortController();
-    let signal = controller.signal;
-    let timer = setTimeout(() => controller.abort(), timeout);
-
-    try {
-        await fetch(url + "?nocache=" + Math.random(), { method: 'HEAD', mode: 'no-cors', signal });
-        clearTimeout(timer);
-        return Math.round(performance.now() - start);
-    } catch (e) {
-        clearTimeout(timer);
-        return null;
-    }
-}
-
+// Ping display using ping.js
 function showPingHeartbeat(active) {
     const heartbeat = document.getElementById('ping-heartbeat');
     if (heartbeat) heartbeat.style.display = active ? 'block' : 'none';
 }
 
-async function updatePing() {
-    const pingElem = document.getElementById('wan-ping');
+function updatePing() {
+    var pingElem = document.getElementById('wan-ping');
     showPingHeartbeat(true);
     pingElem.textContent = "...";
-    const latency = await pingServer("https://dns.google");
-    showPingHeartbeat(false);
-    if (latency !== null) {
-        pingElem.textContent = latency;
-    } else {
-        pingElem.textContent = "Timeout";
-    }
+    var p = new Ping();
+    // Use a reliable site with a favicon.ico
+    p.ping("https://dns.google/favicon.ico", function(err, data) {
+        showPingHeartbeat(false);
+        if (err) {
+            pingElem.textContent = "Timeout";
+        } else {
+            pingElem.textContent = Math.round(data);
+        }
+    });
 }
 
-// Initialize all
 document.addEventListener('DOMContentLoaded', function() {
     fetchWanInfo();
     updatePing();
@@ -263,8 +241,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchWanInfo();
         updatePing();
     });
-    setInterval(fetchWanInfo, 300000); // Refresh WAN info every 5 minutes
-    setInterval(updatePing, 10000); // Refresh ping every 10 seconds
+    setInterval(fetchWanInfo, 300000); // Refresh WAN info every 5 min
+    setInterval(updatePing, 10000);    // Refresh ping every 10 sec
 });
 </script>
 </body>
