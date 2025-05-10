@@ -5,6 +5,7 @@
         $title = "Home";
         include("head.php");
     ?>
+    <link rel="icon" type="image/x-icon" href="icon.ico">
     <style>
     body {
         background-image: url('img/re.jpg');
