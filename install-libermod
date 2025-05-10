@@ -13,7 +13,7 @@ echo -e "#############################################"
 echo -e "        #  Libernet Mod Installer  #"
 echo -e "#############################################\n"
 sleep 1
-echo -e "Sebelum Install Libernet Mod Pastikan Anda sudah install Libernet by Lutfa Ilham\n"
+echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lutfa Ilham\n"
 sleep 1
 echo -e "- Remove Login Page"
 echo -e "- Remove Speedtest Page"
