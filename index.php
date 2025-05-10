@@ -5,7 +5,10 @@
         $title = "Home";
         include("head.php");
     ?>
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="icon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
+    <!-- If your icon is in img/, use: href="img/icon.ico" -->
     <style>
     body {
         background-image: url('img/re.jpg');
