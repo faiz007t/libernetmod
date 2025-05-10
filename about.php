@@ -15,7 +15,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="text-center">
-                            <h3><i class="fa fa-info"></i> About Libernet</h3>
+                            <h3><i class="fa fa-info"></i> About Libernet Mod</h3>
                         </div>
                     </div>
                     <div class="card-body">
@@ -38,8 +38,8 @@
                                 Some features still under development!
                             </p>
                         </div>
-			<p class="text-center m-0"><a href="https://facebook.com/lutfailham">Report bug</a></p>
-                        <p class="text-center m-0">Author: <a href="https://facebook.com/lutfailham"><i>Lutfa Ilham</i></a></p>
+			<p class="text-center m-0"><a href="">Report bug</a></p>
+                        <p class="text-center m-0">Author: <i>Modified by faisal971</i></a></p>
                     </div>
                 </div>
             </div>
