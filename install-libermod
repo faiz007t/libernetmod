@@ -2,38 +2,32 @@
 
 clear
 echo -e "#############################################"
-echo -e "#  Libermod Installer by Hanif Widi Widodo  #"
+echo -e "        #  Libernet Mod Installer  #"        
 echo -e "#############################################"
 echo -e ""
 sleep 1
-echo -e "*Sebelum install libermod pastikan sudah terinstall libernet sebelumnya*"
+echo -e "*Sebelum Install Libernet Mod Pastikan Anda dh Install Libernet by Lutfa Ilham"
 echo -e ""
 sleep 1
-echo -e "- REMOVE LOGIN PAGE"
-echo -e "- REMOVE SPEEDTEST PAGE"
-echo -e "- CHANGE THEME COLOR"
-echo -e "- CHANGE BACKGROUND IMAGE"
+echo -e "- Remove Login Page"
+echo -e "- Remove Speedtest Page"
+echo -e "- Change Theme Color"
+echo -e "- Change Background Image"
 echo -e ""
 sleep 3
-echo -e "Harap tunggu, libermod segera di install..."
-echo -e "#"
+echo -e "Waiting for Prosess Install Libernet Mod..."
 sleep 1
-echo -e "##"
 sleep 1
-echo -e "###"
 sleep 2
-echo -e "Downloading file..."
 {
 opkg install unzip
 wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernet/raw/main/libernet.zip
 rm -r /www/libernet
 } &> log-download.txt
-echo -e "Extacting file..."
 {
 unzip /www/libernet.zip -d /www
 } &> log-extract.txt
 sleep 2
-echo -e "Mod & Change Theme Color..."
 {
 wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/system.php
 wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/navbar.php
@@ -50,7 +44,7 @@ wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githu
 rm /www/libernet.zip
 rm install-libermod
 echo -e ""
+echo -e "Prosess Pemasangan Libernet Mod Selesai !!!"
 echo -e ""
-echo -e "PROSES PEMASANGAN LIBERMOD SELESAI!"
-echo -e "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
+echo -e "NOTE: Pastikan Clear Cache Browser Sebelum Masuk ke Libernet"
 echo -e ""
