@@ -38,12 +38,6 @@ if [ -d /www/libernet ]; then
     cp -r /www/libernet /www/libernet_backup_$(date +%s)
 fi
 
-# === Preserve all config modes ===
-if [ -d /root/libernet/data/config ]; then
-    echo "Backing up all Libernet mode configs..."
-    cp -r /root/libernet/data/config /root/libernet/data/config_backup_$(date +%s)
-fi
-
 # Download and extract Libernet Mod
 echo "Downloading Libernet Mod..."
 {
@@ -58,7 +52,7 @@ echo "Extracting Libernet Mod..."
 
 sleep 2
 
-# Download modified files (these should NOT overwrite mode config files)
+# Download modified files
 echo "Downloading modified files..."
 {
     wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
