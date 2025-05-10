@@ -249,9 +249,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchWanInfo();
         updatePing();
     });
-    // Auto-refresh removed
-    // setInterval(fetchWanInfo, 300000);
-    // setInterval(updatePing, 10000);
+    // Auto-refresh
+       setInterval(fetchWanInfo, 300000);
+       setInterval(updatePing, 10000);
 });
 </script>
 </body>
