@@ -129,18 +129,18 @@
                                 <!-- WAN Info Section (HTML + JS) -->
                                 <div class="col-lg-6 col-md-6">
 									<i class="fa fa-server"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip"></span></span>
+                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
                                 </div>
                                 <!-- Ping Section -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
                                     <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
                                         <span class="ping-heartbeat" id="ping-heartbeat"></span>
                                     </i>
-                                    <span class="text-primary">Ping: <span id="wan-ping"></span> ms</span>
+                                    <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
 								    <i class="fa fa-flag-o"></i>
-                                    <span class="text-primary">ISP: <span id="wan-net"></span> (<span id="wan-country"></span>)</span>
+                                    <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
                                 </div>
                                 <!-- End WAN Info Section -->
 				<div class="col-12 mb-2">
@@ -165,21 +165,6 @@
 
 <!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
 <script>
-// Helper: fetch with timeout
-async function fetchWithTimeout(resource, options = {}) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
-    options.signal = controller.signal;
-    try {
-        const response = await fetch(resource, options);
-        clearTimeout(id);
-        return response;
-    } catch (e) {
-        clearTimeout(id);
-        throw e;
-    }
-}
-
 async function fetchWanInfo() {
     const ipElem = document.getElementById('wan-ip');
     const netElem = document.getElementById('wan-net');
@@ -193,27 +178,23 @@ async function fetchWanInfo() {
     if (btn) btn.disabled = true;
     setFields('Loading...', 'Loading...', 'Loading...');
     try {
-        try {
-            const resp1 = await fetchWithTimeout('http://ip-api.com/json/');
-            if (!resp1.ok) throw new Error('ip-api.com unavailable');
-            const data1 = await resp1.json();
-            if (data1.status === 'success') {
-                setFields(data1.query, data1.isp, data1.country);
-                return;
-            }
-        } catch (e) {}
-        try {
-            const resp2 = await fetchWithTimeout('https://api.ipapi.is/?q=');
-            if (!resp2.ok) throw new Error('ipapi.is unavailable');
-            const data2 = await resp2.json();
-            setFields(
-                data2.ip,
-                data2.company && data2.company.name ? data2.company.name : 'Unavailable',
-                data2.location && data2.location.country ? data2.location.country : 'Unavailable'
-            );
-        } catch (e) {
-            setFields('Unavailable', 'Unavailable', 'Unavailable');
+        const resp1 = await fetch('http://ip-api.com/json/');
+        if (!resp1.ok) throw new Error('ip-api.com unavailable');
+        const data1 = await resp1.json();
+        if (data1.status === 'success') {
+            setFields(data1.query, data1.isp, data1.country);
+            return;
         }
+    } catch (e) {}
+    try {
+        const resp2 = await fetch('https://api.ipapi.is/?q=');
+        if (!resp2.ok) throw new Error('ipapi.is unavailable');
+        const data2 = await resp2.json();
+        setFields(
+            data2.ip,
+            data2.company && data2.company.name ? data2.company.name : 'Unavailable',
+            data2.location && data2.location.country ? data2.location.country : 'Unavailable'
+        );
     } catch (e) {
         setFields('Unavailable', 'Unavailable', 'Unavailable');
     } finally {
@@ -267,8 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchWanInfo();
         updatePing();
     });
-    setInterval(fetchWanInfo, 300000); // Refresh WAN info every 5 min
-    setInterval(updatePing, 10000);    // Refresh ping every 10 sec
+    // setInterval(fetchWanInfo, 300000); // Auto-refresh removed
+    // setInterval(updatePing, 10000);    // Auto-refresh removed
 });
 </script>
 </body>
