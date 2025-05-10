@@ -216,58 +216,6 @@
     </div>
   </div>
 
-  <!-- Vue 3, Bootstrap JS, and Dashboard Logic -->
-  <script src="https://unpkg.com/vue@3"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-  <script>
-  // Simulated Vue data for demo. Replace with your actual logic.
-  const app = Vue.createApp({
-    data() {
-      return {
-        config: {
-          mode: 0,
-          profile: '',
-          temp: {
-            modes: [
-              {value: 0, name: 'Mode 0'},
-              {value: 1, name: 'Mode 1'},
-              {value: 5, name: 'Mode 5'}
-            ]
-          },
-          profiles: ['Default', 'Profile1', 'Profile2'],
-          system: {
-            tun2socks: { legacy: false },
-            tunnel: { autostart: false, dns_resolver: false, ping_loop: false },
-            system: { memory_cleaner: false }
-          }
-        },
-        status: false,
-        statusText: 'Start',
-        connection: 0, // 0: idle, 1: connecting, 2: connected, 3: error
-        connectionText: 'Idle',
-        connectedTime: '',
-        log: 'Libernet log will appear here...\n'
-      }
-    },
-    methods: {
-      runLibernet() {
-        this.status = !this.status;
-        this.statusText = this.status ? 'Stop' : 'Start';
-        this.connection = this.status ? 2 : 0;
-        this.connectionText = this.status ? 'Connected' : 'Idle';
-        if (this.status) {
-          this.connectedTime = '00:00:01';
-          this.log += 'Libernet started...\n';
-        } else {
-          this.connectedTime = '';
-          this.log += 'Libernet stopped.\n';
-        }
-      }
-    }
-  });
-  app.mount('#app');
-  </script>
-  <script>
   // WAN Info and Ping Logic
   async function fetchWithTimeout(resource, options = {}) {
     const controller = new AbortController();
