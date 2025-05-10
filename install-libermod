@@ -152,4 +152,4 @@ rm -f /www/libernet.zip
 rm -f "$0"
 
 echo -e "\nProses Pemasangan Libernet Mod Selesai !!!"
-echo -e "\nNOTE: Pastikan clear cache browser sebelum masuk ke Libernet\n"
+echo -e "\nNOTE: Pastikan clear dulu cache browser sebelum masuk ke Libernet Mod\n"
