@@ -5,7 +5,7 @@
 
 HOME="/root"
 DOWNLOADS_DIR="${HOME}/Downloads"
-LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
+LIBERNET_TMP="${DOWNLOADS_DIR}/libernetmod"
 REPOSITORY_URL="git://github.com/faiz007t/libernetmod.git"
 
 function update_libernet() {
@@ -13,13 +13,13 @@ function update_libernet() {
     echo -e "There's no Libernet installer on ~/Downloads directory, please clone it first!"
     exit 1
   fi
-  # change working dir to Libernet installer
+  # change working dir to Libernet Mod installer
   cd "${LIBERNET_TMP}"
-  # verify Libernet installer
+  # verify Libernet Mod installer
   if git branch > /dev/null 2>&1; then
     update_libernet_cli
   else
-    echo -e "This is not Libernet installer directory, please use installer directory to update Libernet!"
+    echo -e "This is not Libernet Mod installer directory, please use installer directory to update Libernet Mod !"
     exit 1
   fi
 }
