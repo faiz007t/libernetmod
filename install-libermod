@@ -1,50 +1,63 @@
 #!/bin/bash
 
+set -e
+
+# Check for root permissions
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
 clear
 echo -e "#############################################"
-echo -e "        #  Libernet Mod Installer  #"        
-echo -e "#############################################"
-echo -e ""
+echo -e "        #  Libernet Mod Installer  #"
+echo -e "#############################################\n"
 sleep 1
-echo -e "*Sebelum Install Libernet Mod Pastikan Anda dh Install Libernet by Lutfa Ilham"
-echo -e ""
+echo -e "*Sebelum Install Libernet Mod Pastikan Anda sudah install Libernet by Lutfa Ilham\n"
 sleep 1
 echo -e "- Remove Login Page"
 echo -e "- Remove Speedtest Page"
 echo -e "- Change Theme Color"
-echo -e "- Change Background Image"
-echo -e ""
+echo -e "- Change Background Image\n"
 sleep 3
-echo -e "Waiting for Prosess Install Libernet Mod..."
-sleep 1
-sleep 1
+echo -e "Waiting for Proses Install Libernet Mod...\n"
 sleep 2
-{
+
+# Ensure opkg and unzip are available
+command -v opkg >/dev/null 2>&1 || { echo >&2 "opkg not found! Aborting."; exit 1; }
 opkg install unzip
-wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
-rm -r /www/libernet
+
+# Download and extract Libernet Mod
+{
+    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
+    rm -rf /www/libernet
 } &> log-download.txt
+
 {
-unzip /www/libernet.zip -d /www
+    unzip -o /www/libernet.zip -d /www
 } &> log-extract.txt
+
 sleep 2
+
+# Download modified files
 {
-wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
-wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php
-wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
-wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
-wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php
-wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
-wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
-wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
-wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
+    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
+    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php
+    wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
+    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
+    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php
+    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
+    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
+    wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+    wget -O /www/libernet/assets/img/backgrounds/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+    wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
+    wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
-rm /www/libernet.zip
-rm install-libermod
-echo -e ""
-echo -e "Prosess Pemasangan Libernet Mod Selesai !!!"
-echo -e ""
-echo -e "NOTE: Pastikan Clear Cache Browser Sebelum Masuk ke Libernet"
-echo -e ""
+
+rm -f /www/libernet.zip
+
+# Remove the installer itself (if desired)
+rm -f "$0"
+
+echo -e "\nProses Pemasangan Libernet Mod Selesai !!!\n"
+echo -e "NOTE: Pastikan clear cache browser sebelum masuk ke Libernet\n"
