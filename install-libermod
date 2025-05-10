@@ -9,9 +9,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 clear
-echo -e "#############################################"
-echo -e "        #  Libernet Mod Installer  #"
-echo -e "#############################################\n"
+echo -e "##############################################"
+echo -e "     #  Libernet Mod v1.5.4 Installer  #"     
+echo -e "##############################################\n"
 sleep 1
 echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lutfa Ilham\n"
 sleep 1
