@@ -136,7 +136,7 @@
                                     <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
                                         <span class="ping-heartbeat" id="ping-heartbeat"></span>
                                     </i>
-                                    <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
+                                    <span class="text-primary">Ping: <span id="wan-ping">...</span>ms</span>
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
 								    <i class="fa fa-flag-o"></i>
