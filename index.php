@@ -5,6 +5,15 @@
         $title = "Home";
         include("head.php");
     ?>
+    <style>
+    body {
+        background-image: url('img/re.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+    }
+    </style>
 </head>
 <body>
 <div id="app">
