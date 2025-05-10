@@ -1,76 +1,106 @@
 #!/bin/bash
+# Libernet Mod Installer with LuCI Integration
+# Combined script with enhanced error handling and styling
 
 set -e
 
-# Check for root permissions
+# ---------------------------
+# Configuration Variables
+# ---------------------------
+LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
+LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
+LIBERNET_DIR="/www/libernet"
+BACKUP_DIR="/www/libernet_backup_$(date +%s)"
+GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
+
+# ---------------------------
+# Root Check
+# ---------------------------
 if [[ "$EUID" -ne 0 ]]; then
-   echo "This script must be run as root" 
+   echo "ERROR: Script harus dijalankan sebagai root!" 
    exit 1
 fi
 
+# ---------------------------
+# Initialization
+# ---------------------------
 clear
 echo -e "##############################################"
-echo -e "#       Libernet Mod v1.5.4 Installer        #"
+echo -e "#     Libernet Mod v1.5.4 Installer Pro      #"
 echo -e "##############################################\n"
-sleep 1
-echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lutfa Ilham\n"
-sleep 1
-echo -e "List New Update and Remove:"
-echo -e "- Add Ping"
-echo -e "- Add Refresh Info Button"
-echo -e "- Add Page in List Services"
-echo -e "- Remove Login Page"
-echo -e "- Remove Speedtest Page"
-echo -e "- Remove TX|RX"
-echo -e "- Change Theme Color"
-echo -e "- Change Background Image\n"
-sleep 3
-echo -e "Waiting for Proses Install Libernet Mod...\n"
+echo -e "Pastikan sudah install Libernet dasar oleh Lutfa Ilham!\n"
 sleep 2
 
-# Ensure opkg and unzip are available
-command -v opkg >/dev/null 2>&1 || { echo >&2 "opkg not found! Aborting."; exit 1; }
-command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip not found! Installing..."; opkg install unzip; }
+# ---------------------------
+# Dependency Check
+# ---------------------------
+check_dependency() {
+    if ! command -v $1 &> /dev/null; then
+        echo "Menginstall dependency: $1..."
+        opkg update && opkg install $1
+    fi
+}
 
-# Backup existing Libernet (optional)
-if [ -d "/www/libernet" ]; then
-    echo "Backing up existing Libernet directory..."
-    cp -r "/www/libernet" "/www/libernet_backup_$(date +%s)"
+check_dependency unzip
+check_dependency wget
+
+# ---------------------------
+# Backup Existing Installation
+# ---------------------------
+if [ -d "$LIBERNET_DIR" ]; then
+    echo -e "\nMembuat backup instalasi sebelumnya..."
+    cp -r "$LIBERNET_DIR" "$BACKUP_DIR"
+    echo -e "Backup tersimpan di: $BACKUP_DIR\n"
 fi
 
-# Download and extract Libernet Mod
-echo "Downloading Libernet Mod..."
+# ---------------------------
+# Main Installation
+# ---------------------------
+echo -e "\nMemulai proses instalasi Libernet Mod..."
 {
-    wget -O "/www/libernet.zip" --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip || { echo "Failed to download libernet.zip"; exit 1; }
-    rm -rf "/www/libernet"
-} &> log-download.txt
-
-echo "Extracting Libernet Mod..."
-{
+    echo -e "\nMengunduh paket utama..."
+    wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
+    
+    echo -e "\nMengekstrak file..."
     unzip -o "/www/libernet.zip" -d "/www"
-} &> log-extract.txt
+    
+    echo -e "\nMemasang file modifikasi:"
+    declare -A MOD_FILES=(
+        ["system.php"]="system.php"
+        ["navbar.php"]="navbar.php" 
+        ["index.php"]="index.php"
+        ["head.php"]="head.php"
+        ["footer.php"]="footer.php"
+        ["config.php"]="config.php"
+        ["about.php"]="about.php"
+        ["re.jpg"]="re.jpg"
+        ["backgrounds/re.jpg"]="assets/img/backgrounds/re.jpg"
+        ["bootstrap.min.css"]="lib/vendor/bootstrap/css/bootstrap.min.css"
+        ["ping-loop.sh"]="../../root/libernet/bin/ping-loop.sh"
+    )
 
-sleep 2
+    for file in "${!MOD_FILES[@]}"; do
+        echo " - ${MOD_FILES[$file]}"
+        wget -O "${LIBERNET_DIR}/${MOD_FILES[$file]}" --no-check-certificate "${GITHUB_BASE}/${file}"
+    done
 
-# Download modified files
-echo "Downloading modified files..."
-{
-    wget -O "/www/libernet/system.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php || { echo "Failed to download system.php"; exit 1; }
-    wget -O "/www/libernet/navbar.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php || { echo "Failed to download navbar.php"; exit 1; }
-    wget -O "/www/libernet/index.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php || { echo "Failed to download index.php"; exit 1; }
-    wget -O "/www/libernet/head.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php || { echo "Failed to download head.php"; exit 1; }
-    wget -O "/www/libernet/footer.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php || { echo "Failed to download footer.php"; exit 1; }
-    wget -O "/www/libernet/config.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php || { echo "Failed to download config.php"; exit 1; }
-    wget -O "/www/libernet/about.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php || { echo "Failed to download about.php"; exit 1; }
-    wget -O "/www/libernet/img/re.jpg" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg || { echo "Failed to download re.jpg"; exit 1; }
-    wget -O "/www/libernet/assets/img/backgrounds/re.jpg" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg || { echo "Failed to download background re.jpg"; exit 1; }
-    wget -O "/www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css || { echo "Failed to download bootstrap.min.css"; exit 1; }
-    wget -O "/root/libernet/bin/ping-loop.sh" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh || { echo "Failed to download ping-loop.sh"; exit 1; }
-} &> log-install.txt
+    echo -e "\nMengatur permission..."
+    chmod +x "/root/libernet/bin/ping-loop.sh"
+} 2>&1 | tee install.log
 
-# Add LuCI integration
-{
-cat <<'EOF' > /usr/lib/lua/luci/view/libernet.htm
+# ---------------------------
+# LuCI Integration
+# ---------------------------
+echo -e "\nMembuat integrasi LuCI..."
+cat > $LUCI_CONTROLLER <<'EOF'
+module("luci.controller.libernet", package.seeall)
+
+function index()
+    entry({"admin", "services", "libernet"}, template("libernet"), _("Libernet"), 55).leaf = true
+end
+EOF
+
+cat > $LUCI_VIEW <<'EOF'
 <!DOCTYPE html>
 <html>
 <head>
@@ -142,19 +172,32 @@ cat <<'EOF' > /usr/lib/lua/luci/view/libernet.htm
 </body>
 </html>
 EOF
-}
 
-# Make sure ping-loop.sh is executable
-if [ -f "/root/libernet/bin/ping-loop.sh" ]; then
-    chmod +x "/root/libernet/bin/ping-loop.sh"
-else
-    echo "Warning: /root/libernet/bin/ping-loop.sh not found, cannot set executable permission"
-fi
+# ---------------------------
+# Final Configuration
+# ---------------------------
+echo -e "\nMengatur permission file..."
+chmod 644 $LUCI_CONTROLLER
+chmod 644 $LUCI_VIEW
 
+echo -e "\nMerestart layanan web..."
+/etc/init.d/uhttpd restart
+
+# ---------------------------
+# Cleanup
+# ---------------------------
+echo -e "\nMembersihkan file instalasi..."
 rm -f "/www/libernet.zip"
-
-# Remove the installer itself (if desired)
 rm -f "$0"
 
-echo -e "\nProses Pemasangan Libernet Mod Selesai !!!"
-echo -e "\nNOTE: Pastikan clear dulu cache browser sebelum masuk ke Libernet Mod\n"
+# ---------------------------
+# Completion Message
+# ---------------------------
+echo -e "\n\033[1;32mINSTALASI BERHASIL!\033[0m"
+echo -e "Akses Libernet Mod melalui:"
+echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "2. LuCI Interface: Menu Services -> Libernet"
+echo -e "\nJangan lupa untuk:"
+echo -e "- Membersihkan cache browser"
+echo -e "- Memeriksa log instalasi di: install.log"
+echo -e "- Backup konfigurasi penting\n"
