@@ -73,8 +73,6 @@ echo -e "\nMemulai proses instalasi Libernet Mod..."
         ["footer.php"]="footer.php"
         ["config.php"]="config.php"
         ["about.php"]="about.php"
-        ["re.jpg"]="re.jpg"
-        ["backgrounds/re.jpg"]="assets/img/backgrounds/re.jpg"
         ["bootstrap.min.css"]="lib/vendor/bootstrap/css/bootstrap.min.css"
         ["ping-loop.sh"]="../../root/libernet/bin/ping-loop.sh"
     )
