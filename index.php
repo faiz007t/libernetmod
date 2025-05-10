@@ -129,7 +129,7 @@
                                 <!-- WAN Info Section (HTML + JS) -->
                                 <div class="col-lg-6 col-md-6">
 									<i class="fa fa-server"></i>
-                                    <span class="text-primary">WAN IP: <span id="wan-ip">Loading...</span></span>
+                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
 								    <i class="fa fa-flag-o"></i>
@@ -143,13 +143,9 @@
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
                                 <!-- End WAN Info Section -->
-                                <div v-if="connection === 2" class="col-lg-6 col-md-6" >
-									<i class="fa fa-exchange"></i>
-                                    <span class="text-primary">TX: </span><span class="text-primary">{{ total_data.tx }} | RX: {{ total_data.rx }}</span>
-                                </div>
 				<div class="col-12 mb-2">
                                     <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
-                                        <i class="fa fa-refresh"></i> Refresh WAN Info
+                                        <i class="fa fa-refresh"></i> Refresh Info
                                     </button>
                                 </div>
                                 <div class="col pt-2">
