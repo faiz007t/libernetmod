@@ -249,8 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePing();
     });
     // Auto-refresh removed
-    // setInterval(fetchWanInfo, 300000);
-    // setInterval(updatePing, 10000);
+    // setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
+    // setInterval(updatePing, 5000);    // Refresh ping every 5 seconds
 });
 </script>
 </body>
