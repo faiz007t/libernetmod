@@ -19,7 +19,7 @@ echo -e "- Add Ping"
 echo -e "- Add Refresh WAN Button"
 echo -e "- Remove Login Page"
 echo -e "- Remove Speedtest Page"
-echo -e "- Remove RX|TX"
+echo -e "- Remove TX|RX"
 echo -e "- Change Theme Color"
 echo -e "- Change Background Image\n"
 sleep 3
