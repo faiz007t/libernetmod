@@ -8,7 +8,4 @@
 <!-- Main CSS -->
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/png" href="img/icon1.png">
-<title>Libermod | <?= $title ?></title>
-<audio autoplay="true" loop="true">
-<source src="music/music.mp3" type="audio/mpeg" preload="auto">
-</audio>
+<title>Libernet Mod | <?= $title ?></title>
