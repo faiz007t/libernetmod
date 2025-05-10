@@ -8,7 +8,6 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
-    <!-- If your icon is in img/, use: href="img/icon.ico" -->
     <style>
     body {
         background-image: url('img/re.jpg');
@@ -142,40 +141,54 @@
 <?php include("javascript.php"); ?>
 <script src="js/index.js"></script>
 
-<!-- WAN Info JavaScript -->
+<!-- WAN Info JavaScript (Dual Provider, with fallback) -->
 <script>
-function fetchWanInfo() {
+async function fetchWanInfo() {
     const ipElem = document.getElementById('wan-ip');
     const netElem = document.getElementById('wan-net');
     const countryElem = document.getElementById('wan-country');
     const btn = document.getElementById('refresh-wan-btn');
 
-    if (btn) btn.disabled = true;
-    ipElem.textContent = 'Loading...';
-    netElem.textContent = 'Loading...';
-    countryElem.textContent = 'Loading...';
+    // Helper to set fields
+    const setFields = (ip, isp, country) => {
+        ipElem.textContent = ip || 'Unavailable';
+        netElem.textContent = isp || 'Unavailable';
+        countryElem.textContent = country || 'Unavailable';
+    };
 
-    fetch('http://ip-api.com/json/')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                ipElem.textContent = data.query || 'Unavailable';
-                netElem.textContent = data.isp || 'Unavailable';
-                countryElem.textContent = data.country || 'Unavailable';
-            } else {
-                ipElem.textContent = 'Unavailable';
-                netElem.textContent = 'Unavailable';
-                countryElem.textContent = 'Unavailable';
-            }
-        })
-        .catch(() => {
-            ipElem.textContent = 'Unavailable';
-            netElem.textContent = 'Unavailable';
-            countryElem.textContent = 'Unavailable';
-        })
-        .finally(() => {
+    // Loading state
+    if (btn) btn.disabled = true;
+    setFields('Loading...', 'Loading...', 'Loading...');
+
+    // Try ip-api.com first
+    try {
+        const resp1 = await fetch('http://ip-api.com/json/');
+        if (!resp1.ok) throw new Error('ip-api.com unavailable');
+        const data1 = await resp1.json();
+        if (data1.status === 'success') {
+            setFields(data1.query, data1.isp, data1.country);
             if (btn) btn.disabled = false;
-        });
+            return;
+        }
+    } catch (e) {
+        // Continue to fallback
+    }
+
+    // Fallback: ipapi.is (no API key required)
+    try {
+        const resp2 = await fetch('https://api.ipapi.is/?q=');
+        if (!resp2.ok) throw new Error('ipapi.is unavailable');
+        const data2 = await resp2.json();
+        setFields(
+            data2.ip,
+            data2.company && data2.company.name ? data2.company.name : 'Unavailable',
+            data2.location && data2.location.country ? data2.location.country : 'Unavailable'
+        );
+    } catch (e) {
+        setFields('Unavailable', 'Unavailable', 'Unavailable');
+    } finally {
+        if (btn) btn.disabled = false;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
