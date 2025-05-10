@@ -21,7 +21,7 @@ sleep 1
 sleep 2
 {
 opkg install unzip
-wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernet/raw/main/libernet.zip
+wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
 rm -r /www/libernet
 } &> log-download.txt
 {
@@ -29,17 +29,17 @@ unzip /www/libernet.zip -d /www
 } &> log-extract.txt
 sleep 2
 {
-wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/system.php
-wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/navbar.php
-wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/index.php
-wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/head.php
-wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/footer.php
-wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/config.php
-wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/about.php
-wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/re.jpg
-wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/re.jpg
-wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/bootstrap.min.css
-wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernet/main/ping-loop.sh
+wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
+wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php
+wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
+wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
+wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php
+wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
+wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
+wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
+wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
 rm /www/libernet.zip
 rm install-libermod
