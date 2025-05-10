@@ -3,7 +3,7 @@
     $url = end($url_array);
 ?>
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #11195b;">
-    <a class="navbar-brand" href="#">Libermod</a>
+    <a class="navbar-brand" href="#">Libernet Mod</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
