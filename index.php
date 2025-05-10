@@ -10,11 +10,16 @@
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
     <style>
     body {
-        background-image: url('re.jpg');
+        background-image: url('https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
         background-attachment: fixed;
+        height: 100%;
+        min-height: 100vh;
+    }
+    html {
+        height: 100%;
     }
     #ping-icon {
         position: relative;
