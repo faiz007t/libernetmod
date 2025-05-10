@@ -1,9 +1,8 @@
 <?php
-    $url_array =  explode('/', $_SERVER['REQUEST_URI']) ;
+    $url_array = explode('/', $_SERVER['REQUEST_URI']);
     $url = end($url_array);
 ?>
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #11195b;">
-    <a class="navbar-brand" href="#">Libernet Mod</a>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #11195b; position: fixed; top: 0; width: 100%; z-index: 1030;">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
