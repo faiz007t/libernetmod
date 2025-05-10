@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updatePing();
     var btn = document.getElementById('refresh-wan-btn');
     if (btn) btn.addEventListener('click', function(e) {
-        e.preventDefault();
+        // No need for preventDefault, as type="button"
         fetchWanInfo();
         updatePing();
     });
