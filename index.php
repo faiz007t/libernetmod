@@ -144,7 +144,7 @@
                                 </div>
                                 <!-- End WAN Info Section -->
 				<div class="col-12 mb-2">
-                                    <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn" type="button">
+                                    <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
                                         <i class="fa fa-refresh"></i> Refresh Info
                                     </button>
                                 </div>
@@ -183,6 +183,7 @@ async function fetchWanInfo() {
         const data1 = await resp1.json();
         if (data1.status === 'success') {
             setFields(data1.query, data1.isp, data1.country);
+            if (btn) btn.disabled = false;
             return;
         }
     } catch (e) {}
@@ -248,8 +249,9 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchWanInfo();
         updatePing();
     });
-    // setInterval(fetchWanInfo, 300000); // Auto-refresh removed
-    // setInterval(updatePing, 10000);    // Auto-refresh removed
+    // Auto-refresh removed
+    // setInterval(fetchWanInfo, 300000);
+    // setInterval(updatePing, 10000);
 });
 </script>
 </body>
