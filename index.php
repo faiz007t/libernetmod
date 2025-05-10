@@ -118,7 +118,7 @@
                                 </div>
                                 <div v-if="connection === 2" class="col-lg-6 col-md-6" >
 									<i class="fa fa-exchange"></i>
-                                    <span class="text-primary">TX|RX: </span><span class="text-primary">{{ total_data.tx }}|{{ total_data.rx }}</span>
+                                    <span class="text-primary">TX: </span><span class="text-primary">{{ total_data.tx }} | RX: {{ total_data.rx }}</span>
                                 </div>
 				<div class="col-12 mb-2">
                                     <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
