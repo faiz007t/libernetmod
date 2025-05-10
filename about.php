@@ -38,7 +38,6 @@
                                 Some features still under development!
                             </p>
                         </div>
-                        <p class="text-center m-0">Author: <i>Modified by faisal971</i></a></p>
                     </div>
                 </div>
             </div>
