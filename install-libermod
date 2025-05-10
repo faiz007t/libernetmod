@@ -17,7 +17,7 @@ GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
 # Root Check
 # ---------------------------
 if [[ "$EUID" -ne 0 ]]; then
-   echo "ERROR: Script harus dijalankan sebagai root!" 
+   echo "ERROR: Script must be run as root!" 
    exit 1
 fi
 
@@ -26,9 +26,9 @@ fi
 # ---------------------------
 clear
 echo -e "##############################################"
-echo -e "#     Libernet Mod v1.5.4 Installer Pro      #"
+echo -e "#        Libernet Mod v1.5.4 Installer Pro   #"
 echo -e "##############################################\n"
-echo -e "Pastikan sudah install Libernet dasar oleh Lutfa Ilham!\n"
+echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
 sleep 2
 
 # ---------------------------
@@ -36,7 +36,7 @@ sleep 2
 # ---------------------------
 check_dependency() {
     if ! command -v $1 &> /dev/null; then
-        echo "Menginstall dependency: $1..."
+        echo "Installing dependency: $1..."
         opkg update && opkg install $1
     fi
 }
@@ -48,23 +48,23 @@ check_dependency wget
 # Backup Existing Installation
 # ---------------------------
 if [ -d "$LIBERNET_DIR" ]; then
-    echo -e "\nMembuat backup instalasi sebelumnya..."
+    echo -e "\nCreating backup of previous installation..."
     cp -r "$LIBERNET_DIR" "$BACKUP_DIR"
-    echo -e "Backup tersimpan di: $BACKUP_DIR\n"
+    echo -e "Backup saved at: $BACKUP_DIR\n"
 fi
 
 # ---------------------------
 # Main Installation
 # ---------------------------
-echo -e "\nMemulai proses instalasi Libernet Mod..."
+echo -e "\nStarting Libernet Mod installation process..."
 {
-    echo -e "\nMengunduh paket utama..."
+    echo -e "\nDownloading main package..."
     wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
     
-    echo -e "\nMengekstrak file..."
+    echo -e "\nExtracting files..."
     unzip -o "/www/libernet.zip" -d "/www"
     
-    echo -e "\nMemasang file modifikasi:"
+    echo -e "\nInstalling modified files:"
     declare -A MOD_FILES=(
         ["system.php"]="system.php"
         ["navbar.php"]="navbar.php" 
@@ -82,14 +82,14 @@ echo -e "\nMemulai proses instalasi Libernet Mod..."
         wget -O "${LIBERNET_DIR}/${MOD_FILES[$file]}" --no-check-certificate "${GITHUB_BASE}/${file}"
     done
 
-    echo -e "\nMengatur permission..."
+    echo -e "\nSetting file permissions..."
     chmod +x "/root/libernet/bin/ping-loop.sh"
 } 2>&1 | tee install.log
 
 # ---------------------------
 # LuCI Integration
 # ---------------------------
-echo -e "\nMembuat integrasi LuCI..."
+echo -e "\nCreating LuCI integration..."
 cat > $LUCI_CONTROLLER <<'EOF'
 module("luci.controller.libernet", package.seeall)
 
@@ -174,28 +174,28 @@ EOF
 # ---------------------------
 # Final Configuration
 # ---------------------------
-echo -e "\nMengatur permission file..."
+echo -e "\nSetting file permissions..."
 chmod 644 $LUCI_CONTROLLER
 chmod 644 $LUCI_VIEW
 
-echo -e "\nMerestart layanan web..."
+echo -e "\nRestarting web service..."
 /etc/init.d/uhttpd restart
 
 # ---------------------------
 # Cleanup
 # ---------------------------
-echo -e "\nMembersihkan file instalasi..."
+echo -e "\nCleaning up installation files..."
 rm -f "/www/libernet.zip"
 rm -f "$0"
 
 # ---------------------------
 # Completion Message
 # ---------------------------
-echo -e "\n\033[1;32mINSTALASI BERHASIL!\033[0m"
-echo -e "Akses Libernet Mod melalui:"
+echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
+echo -e "Access Libernet Mod via:"
 echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
-echo -e "2. LuCI Interface: Menu Services -> Libernet"
-echo -e "\nJangan lupa untuk:"
-echo -e "- Membersihkan cache browser"
-echo -e "- Memeriksa log instalasi di: install.log"
-echo -e "- Backup konfigurasi penting\n"
+echo -e "2. LuCI Interface: Services Menu -> Libernet"
+echo -e "\nDon't forget to:"
+echo -e "- Clear your browser cache"
+echo -e "- Check installation log at: install.log"
+echo -e "- Backup important configurations\n"
