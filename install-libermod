@@ -28,10 +28,6 @@ sleep 3
 echo -e "Waiting for Proses Install Libernet Mod...\n"
 sleep 2
 
-# Ensure opkg and unzip are available
-command -v opkg >/dev/null 2>&1 || { echo >&2 "opkg not found! Aborting."; exit 1; }
-command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip not found! Installing..."; opkg install unzip; }
-
 # === Preserve all config modes ===
 if [ -d /root/libernet/data/config ]; then
     echo "Backing up all Libernet mode configs..."
