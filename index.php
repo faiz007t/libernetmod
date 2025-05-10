@@ -133,7 +133,7 @@
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
 								    <i class="fa fa-flag-o"></i>
-                                    <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">)Loading...</span></span>
+                                    <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...)</span></span>
                                 </div>
                                 <!-- Ping Section -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
