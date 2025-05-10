@@ -142,6 +142,10 @@
                                     </i>
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
+								<div class="col-lg-6 col-md-6 pb-lg-1">
+								    <i class="fa fa-flag-o"></i>
+                                    <span class="text-primary">ISP2: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
+                                </div>
                                 <!-- End WAN Info Section -->
 				<div class="col-12 mb-2">
                                     <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
