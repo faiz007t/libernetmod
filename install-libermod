@@ -15,6 +15,9 @@ echo -e "#############################################\n"
 sleep 1
 echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lutfa Ilham\n"
 sleep 1
+echo -e "- Add Ping"
+echo -e "- Add Refresh WAN Info"
+echo -e "- Remove Login Page"
 echo -e "- Remove Login Page"
 echo -e "- Remove Speedtest Page"
 echo -e "- Change Theme Color"
