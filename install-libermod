@@ -32,29 +32,11 @@ sleep 2
 command -v opkg >/dev/null 2>&1 || { echo >&2 "opkg not found! Aborting."; exit 1; }
 command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip not found! Installing..."; opkg install unzip; }
 
-# Backup existing Libernet (optional)
-if [ -d /www/libernet ]; then
-    echo "Backing up existing Libernet directory..."
-    cp -r /www/libernet /www/libernet_backup_$(date +%s)
-fi
-
 # === Preserve all config modes ===
 if [ -d /root/libernet/data/config ]; then
     echo "Backing up all Libernet mode configs..."
     cp -r /root/libernet/data/config /root/libernet/data/config_backup_$(date +%s)
 fi
-
-# Download and extract Libernet Mod
-echo "Downloading Libernet Mod..."
-{
-    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
-    rm -rf /www/libernet
-} &> log-download.txt
-
-echo "Extracting Libernet Mod..."
-{
-    unzip -o /www/libernet.zip -d /www
-} &> log-extract.txt
 
 sleep 2
 
