@@ -24,7 +24,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="text-center">
-                            <h4><i class="fa fa-home"></i>Libernet</h4>
+                            <h4><i class="fa fa-home"></i>Libernet Mod</h4>
                         </div>                        
                     </div>					
                     <div class="card-body">						
