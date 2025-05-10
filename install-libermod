@@ -16,7 +16,7 @@ sleep 1
 echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lutfa Ilham\n"
 sleep 1
 echo -e "- Add Ping"
-echo -e "- Add Refresh WAN Button"
+echo -e "- Add Refresh Info Button"
 echo -e "- Add Page in List Services"
 echo -e "- Remove Login Page"
 echo -e "- Remove Speedtest Page"
