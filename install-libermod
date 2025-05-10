@@ -73,8 +73,8 @@ echo -e "\nMemulai proses instalasi Libernet Mod..."
         ["footer.php"]="footer.php"
         ["config.php"]="config.php"
         ["about.php"]="about.php"
-        ["bootstrap.min.css"]="lib/vendor/bootstrap/css/bootstrap.min.css"
-        ["ping-loop.sh"]="../../root/libernet/bin/ping-loop.sh"
+        ["bootstrap.min.css"]="bootstrap.min.css"
+        ["ping-loop.sh"]="ping-loop.sh"
     )
 
     for file in "${!MOD_FILES[@]}"; do
