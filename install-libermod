@@ -28,14 +28,6 @@ sleep 3
 echo -e "Waiting for Proses Install Libernet Mod...\n"
 sleep 2
 
-# === Preserve all config modes ===
-if [ -d /root/libernet/data/config ]; then
-    echo "Backing up all Libernet mode configs..."
-    cp -r /root/libernet/data/config /root/libernet/data/config_backup_$(date +%s)
-fi
-
-sleep 2
-
 # Download modified files (these should NOT overwrite mode config files)
 echo "Downloading modified files..."
 {
