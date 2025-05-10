@@ -28,14 +28,22 @@ sleep 2
 
 # Ensure opkg and unzip are available
 command -v opkg >/dev/null 2>&1 || { echo >&2 "opkg not found! Aborting."; exit 1; }
-opkg install unzip
+command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip not found! Installing..."; opkg install unzip; }
+
+# Backup existing Libernet (optional)
+if [ -d /www/libernet ]; then
+    echo "Backing up existing Libernet directory..."
+    cp -r /www/libernet /www/libernet_backup_$(date +%s)
+fi
 
 # Download and extract Libernet Mod
+echo "Downloading Libernet Mod..."
 {
     wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
     rm -rf /www/libernet
 } &> log-download.txt
 
+echo "Extracting Libernet Mod..."
 {
     unzip -o /www/libernet.zip -d /www
 } &> log-extract.txt
@@ -43,6 +51,7 @@ opkg install unzip
 sleep 2
 
 # Download modified files
+echo "Downloading modified files..."
 {
     wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
     wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php
@@ -57,10 +66,90 @@ sleep 2
     wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
 
+# Add LuCI integration
+echo "Adding LuCI service integration..."
+{
+cat <<'EOF' > /usr/lib/lua/luci/view/libernet.htm
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Libernet Full Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #222;
+      touch-action: manipulation;
+    }
+    #libernet {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+    #luci-back {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      border-radius: 50%;
+      padding: 8px;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+    }
+    #luci-back svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+    @media (max-width: 768px) {
+      #luci-back {
+        width: 44px;
+        height: 44px;
+        top: 8px;
+        left: 8px;
+      }
+      #luci-back svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="luci-back"
+          role="button"
+          aria-label="Return to LuCI interface"
+          onclick="window.location.href='http://' + window.location.hostname + '/cgi-bin/luci/'">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+  </button>
+
+  <iframe id="libernet" scrolling="auto"></iframe>
+
+  <script>
+    document.getElementById("libernet").src = "http://" + window.location.hostname + "/libernet";
+  </script>
+</body>
+</html>
+EOF
+} &>> log-install.txt
+
+# Make sure ping-loop.sh is executable
+chmod +x /root/libernet/bin/ping-loop.sh
+
 rm -f /www/libernet.zip
 
 # Remove the installer itself (if desired)
 rm -f "$0"
 
-echo -e "\nProses Pemasangan Libernet Mod Selesai !!!\n"
-echo -e "NOTE: Pastikan clear cache browser sebelum masuk ke Libernet\n"
+echo -e "\nProses Pemasangan Libernet Mod Selesai !!!"
+echo -e "\nNOTE: Pastikan clear cache browser sebelum masuk ke Libernet\n"
