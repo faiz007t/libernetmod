@@ -12,7 +12,6 @@
 </br>
 </br>
 <li> Run script di terminal:</li>
-```
+<br>```
 opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernet/main/install-libermod -q && bash install-libermod
-```
-```
+```</br>
