@@ -136,7 +136,7 @@
                                     <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
                                         <span class="ping-heartbeat" id="ping-heartbeat"></span>
                                     </i>
-                                    <span class="text-primary">Ping: <span id="wan-ping">...</span>ms</span>
+                                    <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
 								    <i class="fa fa-flag-o"></i>
@@ -144,7 +144,7 @@
                                 </div>
                                 <!-- End WAN Info Section -->
 				<div class="col-12 mb-2">
-                                    <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
+                                    <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn" type="button">
                                         <i class="fa fa-refresh"></i> Refresh Info
                                     </button>
                                 </div>
@@ -165,6 +165,21 @@
 
 <!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
 <script>
+// Helper: fetch with timeout
+async function fetchWithTimeout(resource, options = {}) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+    options.signal = controller.signal;
+    try {
+        const response = await fetch(resource, options);
+        clearTimeout(id);
+        return response;
+    } catch (e) {
+        clearTimeout(id);
+        throw e;
+    }
+}
+
 async function fetchWanInfo() {
     const ipElem = document.getElementById('wan-ip');
     const netElem = document.getElementById('wan-net');
@@ -178,24 +193,27 @@ async function fetchWanInfo() {
     if (btn) btn.disabled = true;
     setFields('Loading...', 'Loading...', 'Loading...');
     try {
-        const resp1 = await fetch('http://ip-api.com/json/');
-        if (!resp1.ok) throw new Error('ip-api.com unavailable');
-        const data1 = await resp1.json();
-        if (data1.status === 'success') {
-            setFields(data1.query, data1.isp, data1.country);
-            if (btn) btn.disabled = false;
-            return;
+        try {
+            const resp1 = await fetchWithTimeout('http://ip-api.com/json/');
+            if (!resp1.ok) throw new Error('ip-api.com unavailable');
+            const data1 = await resp1.json();
+            if (data1.status === 'success') {
+                setFields(data1.query, data1.isp, data1.country);
+                return;
+            }
+        } catch (e) {}
+        try {
+            const resp2 = await fetchWithTimeout('https://api.ipapi.is/?q=');
+            if (!resp2.ok) throw new Error('ipapi.is unavailable');
+            const data2 = await resp2.json();
+            setFields(
+                data2.ip,
+                data2.company && data2.company.name ? data2.company.name : 'Unavailable',
+                data2.location && data2.location.country ? data2.location.country : 'Unavailable'
+            );
+        } catch (e) {
+            setFields('Unavailable', 'Unavailable', 'Unavailable');
         }
-    } catch (e) {}
-    try {
-        const resp2 = await fetch('https://api.ipapi.is/?q=');
-        if (!resp2.ok) throw new Error('ipapi.is unavailable');
-        const data2 = await resp2.json();
-        setFields(
-            data2.ip,
-            data2.company && data2.company.name ? data2.company.name : 'Unavailable',
-            data2.location && data2.location.country ? data2.location.country : 'Unavailable'
-        );
     } catch (e) {
         setFields('Unavailable', 'Unavailable', 'Unavailable');
     } finally {
