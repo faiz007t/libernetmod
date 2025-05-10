@@ -14,4 +14,8 @@
 <li> Run script di terminal:</li>
 <br>```
 opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernet/main/install-libermod -q && bash install-libermod
-```</br>
+```
+```
+
+When rendered on GitHub, this will appear as a single-line, monospaced code block, making it easy to read and copy. This is the standard way to present commands or code in GitHub documentation.
+</br>
