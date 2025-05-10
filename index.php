@@ -16,6 +16,26 @@
         background-position: center center;
         background-attachment: fixed;
     }
+    /* Ping Animation */
+    #ping-icon {
+        position: relative;
+    }
+    .ping-heartbeat {
+        position: absolute;
+        left: 0; top: 0;
+        width: 1em; height: 1em;
+        border-radius: 50%;
+        background: #17a2b8;
+        opacity: 0.6;
+        z-index: -1;
+        animation: ping-anim 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+        display: none;
+    }
+    @keyframes ping-anim {
+        0% { transform: scale(1); opacity: 0.6; }
+        80% { transform: scale(2); opacity: 0; }
+        100% { transform: scale(2); opacity: 0; }
+    }
     </style>
 </head>
 <body>
@@ -116,6 +136,14 @@
 								    <i class="fa fa-flag-o"></i>
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> | <span id="wan-country">Loading...</span></span>
                                 </div>
+                                <!-- Ping Section -->
+                                <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
+                                    <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
+                                        <span class="ping-heartbeat" id="ping-heartbeat"></span>
+                                    </i>
+                                    <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
+                                </div>
+                                <!-- End WAN Info Section -->
                                 <div v-if="connection === 2" class="col-lg-6 col-md-6" >
 									<i class="fa fa-exchange"></i>
                                     <span class="text-primary">TX: </span><span class="text-primary">{{ total_data.tx }} | RX: {{ total_data.rx }}</span>
@@ -125,7 +153,6 @@
                                         <i class="fa fa-refresh"></i> Refresh WAN Info
                                     </button>
                                 </div>
-                                <!-- End WAN Info Section -->
                                 <div class="col pt-2">
                                     <pre ref="log" v-html="log" class="form-control text-left" style="height: auto; width: auto; font-size:80%; background-image-position: center; background-color: #444b8a "></pre>
                                 </div>
@@ -191,14 +218,53 @@ async function fetchWanInfo() {
     }
 }
 
+// Ping Logic
+async function pingServer(url, timeout = 3000) {
+    const start = performance.now();
+    let controller = new AbortController();
+    let signal = controller.signal;
+    let timer = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        await fetch(url + "?nocache=" + Math.random(), { method: 'HEAD', mode: 'no-cors', signal });
+        clearTimeout(timer);
+        return Math.round(performance.now() - start);
+    } catch (e) {
+        clearTimeout(timer);
+        return null;
+    }
+}
+
+function showPingHeartbeat(active) {
+    const heartbeat = document.getElementById('ping-heartbeat');
+    if (heartbeat) heartbeat.style.display = active ? 'block' : 'none';
+}
+
+async function updatePing() {
+    const pingElem = document.getElementById('wan-ping');
+    showPingHeartbeat(true);
+    pingElem.textContent = "...";
+    const latency = await pingServer("https://dns.google");
+    showPingHeartbeat(false);
+    if (latency !== null) {
+        pingElem.textContent = latency;
+    } else {
+        pingElem.textContent = "Timeout";
+    }
+}
+
+// Initialize all
 document.addEventListener('DOMContentLoaded', function() {
     fetchWanInfo();
+    updatePing();
     var btn = document.getElementById('refresh-wan-btn');
     if (btn) btn.addEventListener('click', function(e) {
         e.preventDefault();
         fetchWanInfo();
+        updatePing();
     });
-    // Optional: setInterval(fetchWanInfo, 300000); // Refresh every 5 minutes
+    setInterval(fetchWanInfo, 300000); // Refresh WAN info every 5 minutes
+    setInterval(updatePing, 10000); // Refresh ping every 10 seconds
 });
 </script>
 </body>
