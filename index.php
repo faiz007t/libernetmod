@@ -244,13 +244,13 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchWanInfo();
     updatePing();
     var btn = document.getElementById('refresh-wan-btn');
-    if (btn) btn.addEventListener('click', function() {
+    if (btn) btn.addEventListener('click', function(e) {
+        e.preventDefault();
         fetchWanInfo();
         updatePing();
     });
-    // Auto-refresh removed
-    // setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
-    // setInterval(updatePing, 5000);    // Refresh ping every 5 seconds
+    setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
+    setInterval(updatePing, 5000);     // Refresh ping every 5 seconds
 });
 </script>
 </body>
