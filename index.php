@@ -10,7 +10,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
     <style>
     body {
-        background-image: url('img/re.jpg');
+        background-image: url('re.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
