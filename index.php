@@ -36,8 +36,6 @@
         100% { transform: scale(2); opacity: 0; }
     }
     </style>
-    <!-- ping.js for browser-based ping -->
-    <script src="https://cdn.jsdelivr.net/gh/alfg/ping.js@0.2.2/dist/ping.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -49,7 +47,7 @@
                     <div class="card-header">
                         <div class="text-center">
                             <h4><i class="fa fa-home"></i> Libernet Mod</h4>
-                        </div>                        
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="card-body py-0 px-0">
@@ -171,7 +169,6 @@
 
 <!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
 <script>
-// WAN Info
 async function fetchWanInfo() {
     const ipElem = document.getElementById('wan-ip');
     const netElem = document.getElementById('wan-net');
@@ -210,26 +207,41 @@ async function fetchWanInfo() {
     }
 }
 
-// Ping display using ping.js
+// Browser-based "ping" using image load time
+let pingTimeoutCount = 0;
 function showPingHeartbeat(active) {
     const heartbeat = document.getElementById('ping-heartbeat');
     if (heartbeat) heartbeat.style.display = active ? 'block' : 'none';
 }
-
 function updatePing() {
     var pingElem = document.getElementById('wan-ping');
     showPingHeartbeat(true);
     pingElem.textContent = "...";
-    var p = new Ping();
-    // Use a reliable site with a favicon.ico
-    p.ping("https://dns.google/favicon.ico", function(err, data) {
+    var start = Date.now();
+    var img = new window.Image();
+    var finished = false;
+    img.onload = img.onerror = function() {
+        if (finished) return;
+        finished = true;
         showPingHeartbeat(false);
-        if (err) {
-            pingElem.textContent = "Timeout";
+        var latency = Date.now() - start;
+        if (latency < 5000) {
+            pingTimeoutCount = 0;
+            pingElem.textContent = latency;
         } else {
-            pingElem.textContent = Math.round(data);
+            pingTimeoutCount++;
+            pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
         }
-    });
+    };
+    img.src = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png?cachebust=" + Math.random();
+    setTimeout(function() {
+        if (!finished) {
+            finished = true;
+            showPingHeartbeat(false);
+            pingTimeoutCount++;
+            pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
+        }
+    }, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
