@@ -3,14 +3,14 @@
 set -e
 
 # Check for root permissions
-if [[ $EUID -ne 0 ]]; then
+if [[ "$EUID" -ne 0 ]]; then
    echo "This script must be run as root" 
    exit 1
 fi
 
 clear
 echo -e "##############################################"
-echo -e "#       Libernet Mod v1.5.4 Installer        #"     
+echo -e "#       Libernet Mod v1.5.4 Installer        #"
 echo -e "##############################################\n"
 sleep 1
 echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lutfa Ilham\n"
@@ -33,21 +33,21 @@ command -v opkg >/dev/null 2>&1 || { echo >&2 "opkg not found! Aborting."; exit 
 command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip not found! Installing..."; opkg install unzip; }
 
 # Backup existing Libernet (optional)
-if [ -d /www/libernet ]; then
+if [ -d "/www/libernet" ]; then
     echo "Backing up existing Libernet directory..."
-    cp -r /www/libernet /www/libernet_backup_$(date +%s)
+    cp -r "/www/libernet" "/www/libernet_backup_$(date +%s)"
 fi
 
 # Download and extract Libernet Mod
 echo "Downloading Libernet Mod..."
 {
-    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
-    rm -rf /www/libernet
+    wget -O "/www/libernet.zip" --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip || { echo "Failed to download libernet.zip"; exit 1; }
+    rm -rf "/www/libernet"
 } &> log-download.txt
 
 echo "Extracting Libernet Mod..."
 {
-    unzip -o /www/libernet.zip -d /www
+    unzip -o "/www/libernet.zip" -d "/www"
 } &> log-extract.txt
 
 sleep 2
@@ -55,17 +55,17 @@ sleep 2
 # Download modified files
 echo "Downloading modified files..."
 {
-    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
-    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php
-    wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
-    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
-    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php
-    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
-    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
-    wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-    wget -O /www/libernet/assets/img/backgrounds/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-    wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
-    wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
+    wget -O "/www/libernet/system.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php || { echo "Failed to download system.php"; exit 1; }
+    wget -O "/www/libernet/navbar.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php || { echo "Failed to download navbar.php"; exit 1; }
+    wget -O "/www/libernet/index.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php || { echo "Failed to download index.php"; exit 1; }
+    wget -O "/www/libernet/head.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php || { echo "Failed to download head.php"; exit 1; }
+    wget -O "/www/libernet/footer.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php || { echo "Failed to download footer.php"; exit 1; }
+    wget -O "/www/libernet/config.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php || { echo "Failed to download config.php"; exit 1; }
+    wget -O "/www/libernet/about.php" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php || { echo "Failed to download about.php"; exit 1; }
+    wget -O "/www/libernet/img/re.jpg" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg || { echo "Failed to download re.jpg"; exit 1; }
+    wget -O "/www/libernet/assets/img/backgrounds/re.jpg" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg || { echo "Failed to download background re.jpg"; exit 1; }
+    wget -O "/www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css || { echo "Failed to download bootstrap.min.css"; exit 1; }
+    wget -O "/root/libernet/bin/ping-loop.sh" --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh || { echo "Failed to download ping-loop.sh"; exit 1; }
 } &> log-install.txt
 
 # Add LuCI integration
@@ -142,12 +142,16 @@ cat <<'EOF' > /usr/lib/lua/luci/view/libernet.htm
 </body>
 </html>
 EOF
-} &>> log-install.txt
+}
 
 # Make sure ping-loop.sh is executable
-chmod +x /root/libernet/bin/ping-loop.sh
+if [ -f "/root/libernet/bin/ping-loop.sh" ]; then
+    chmod +x "/root/libernet/bin/ping-loop.sh"
+else
+    echo "Warning: /root/libernet/bin/ping-loop.sh not found, cannot set executable permission"
+fi
 
-rm -f /www/libernet.zip
+rm -f "/www/libernet.zip"
 
 # Remove the installer itself (if desired)
 rm -f "$0"
