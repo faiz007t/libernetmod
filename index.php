@@ -1,233 +1,336 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php
-        $title = "Home";
-        include("head.php");
-    ?>
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="icon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
-    <style>
-    body {
-        background-image: url('img/re.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-attachment: fixed;
+  <title>Libernet Mod</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Bootstrap & FontAwesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #222;
+      color: #fff;
+      touch-action: manipulation;
+    }
+    #app {
+      min-height: 100vh;
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+    .container-fluid {
+      max-width: 100vw;
+    }
+    .card {
+      background: rgba(30, 30, 40, 0.98);
+      color: #fff;
+      border: 1px solid #444;
+      box-shadow: 0 2px 8px #0004;
+    }
+    .card-header {
+      background: rgba(20, 20, 30, 0.98);
+      border-bottom: 1px solid #444;
+    }
+    .form-control, .form-select {
+      background-color: #2a2a3a;
+      color: #fff;
+      border: 1px solid #555;
+    }
+    .form-control:disabled, .form-select:disabled {
+      background-color: #2a2a3a;
+      opacity: 0.7;
+    }
+    pre {
+      background: #23234a !important;
+      color: #0f0;
+      font-size: 80%;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 0;
+      min-height: 80px;
+    }
+    #luci-back {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      border-radius: 50%;
+      padding: 8px;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+      box-shadow: 0 2px 8px #0006;
+    }
+    #luci-back svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+    @media (max-width: 768px) {
+      #luci-back {
+        width: 44px;
+        height: 44px;
+        top: 8px;
+        left: 8px;
+      }
+      #luci-back svg {
+        width: 24px;
+        height: 24px;
+      }
     }
     #ping-icon {
-        position: relative;
+      position: relative;
     }
     .ping-heartbeat {
-        position: absolute;
-        left: 0; top: 0;
-        width: 1em; height: 1em;
-        border-radius: 50%;
-        background: #17a2b8;
-        opacity: 0.6;
-        z-index: -1;
-        animation: ping-anim 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-        display: none;
+      position: absolute;
+      left: 0; top: 0;
+      width: 1em; height: 1em;
+      border-radius: 50%;
+      background: #17a2b8;
+      opacity: 0.6;
+      z-index: -1;
+      animation: ping-anim 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+      display: none;
     }
     @keyframes ping-anim {
-        0% { transform: scale(1); opacity: 0.6; }
-        80% { transform: scale(2); opacity: 0; }
-        100% { transform: scale(2); opacity: 0; }
+      0% { transform: scale(1); opacity: 0.6; }
+      80% { transform: scale(2); opacity: 0; }
+      100% { transform: scale(2); opacity: 0; }
     }
-    </style>
+  </style>
 </head>
 <body>
-<div id="app">
-    <?php include('navbar.php'); ?>
-    <div class="container-fluid" >
-        <div class="row py-2">
-            <div class="col-lg-8 col-md-9 mx-auto mt-3">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="text-center">
-                            <h4><i class="fa fa-home"></i> Libernet Mod</h4>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-body py-0 px-0">
-						<form @submit.prevent="runLibernet">
-                            <div class="form-group form-row my-auto">
-                                <div class="col-lg-4 col-md-4 form-row py-1">
-                                    <div class="col-lg-4 col-md-3 my-auto">
-                                        <label class="my-auto">Mode</label>
-									</div>
-                                    <div class="col">
-                                        <select class="form-control" v-model.number="config.mode" :disabled="status === true" required>
-                                            <option v-for="mode in config.temp.modes" :value="mode.value">{{ mode.name }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 col-md-4 form-row py-1">
-                                    <div class="col-lg-4 col-md-3 my-auto">
-                                        <label class="my-auto" >Config</label>
-									</div>
-                                    <div class="col">
-                                        <select class="form-control " v-model="config.profile" :disabled="status === true" required>
-                                            <option v-for="profile in config.profiles" :value="profile">{{ profile }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col form-row py-1">
-                                    <div class="col">
-                                       <button type="submit" class="btn" :class="{ 'btn-danger': status, 'btn-primary': !status }">{{ statusText }}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                            <div class="row">
-                                <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy" >
-                                        <label class="form-check-label" for="tun2socks-legacy">
-                                            Use tun2socks legacy
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
-                                        <label class="form-check-label" for="autostart">
-                                            Auto start Libernet on boot
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status === true" id="dns-resolver">
-                                        <label class="form-check-label" for="dns-resolver">
-                                            DNS resolver
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.system.memory_cleaner" :disabled="status === true" id="memory-cleaner">
-                                        <label class="form-check-label" for="memory-cleaner">
-                                            Memory cleaner
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.ping_loop" :disabled="status === true" id="ping-loop">
-                                        <label class="form-check-label" for="ping-loop">
-                                            PING loop
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6">
-									<i class="fa fa-flag"></i>
-                                    <span class="text-primary">Status: </span><span :class="{ 'text-primary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }">{{ connectionText }}</span>
-                                    <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
-                                </div>
-                                <!-- WAN Info Section (HTML + JS) -->
-                                <div class="col-lg-6 col-md-6">
-									<i class="fa fa-server"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip"></span></span>
-                                </div>
-                                <!-- Ping Section -->
-                                <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
-                                    <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
-                                        <span class="ping-heartbeat" id="ping-heartbeat"></span>
-                                    </i>
-                                    <span class="text-primary">Ping: <span id="wan-ping"></span> ms</span>
-                                </div>
-								<div class="col-lg-6 col-md-6 pb-lg-1">
-								    <i class="fa fa-flag-o"></i>
-                                    <span class="text-primary">ISP: <span id="wan-net"></span> (<span id="wan-country"></span>)</span>
-                                </div>
-                                <!-- End WAN Info Section -->
-				<div class="col-12 mb-2">
-                                    <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn" type="button">
-                                        <i class="fa fa-refresh"></i> Refresh Info
-                                    </button>
-                                </div>
-                                <div class="col pt-2">
-                                    <pre ref="log" v-html="log" class="form-control text-left" style="height: auto; width: auto; font-size:80%; background-image-position: center; background-color: #444b8a "></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <?php include('footer.php'); ?>
-    </div>
-</div>
-<?php include("javascript.php"); ?>
-<script src="js/index.js"></script>
+  <!-- LuCI Back Button -->
+  <button id="luci-back"
+    role="button"
+    aria-label="Return to LuCI interface"
+    onclick="window.location.href='/cgi-bin/luci/'">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+  </button>
 
-<!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
-<script>
-// Helper: fetch with timeout
-async function fetchWithTimeout(resource, options = {}) {
+  <div id="app">
+    <div class="container-fluid">
+      <div class="row py-2">
+        <div class="col-lg-8 col-md-10 mx-auto mt-3">
+          <div class="card">
+            <div class="card-header">
+              <div class="text-center">
+                <h4><i class="fa fa-home"></i> Libernet Mod</h4>
+              </div>
+            </div>
+            <div class="card-body">
+              <form @submit.prevent="runLibernet">
+                <div class="form-group row align-items-center">
+                  <div class="col-md-4 mb-2">
+                    <label class="form-label mb-1">Mode</label>
+                    <select class="form-select" v-model.number="config.mode" :disabled="status" required>
+                      <option v-for="mode in config.temp.modes" :value="mode.value">{{ mode.name }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-2">
+                    <label class="form-label mb-1">Config</label>
+                    <select class="form-select" v-model="config.profile" :disabled="status" required>
+                      <option v-for="profile in config.profiles" :value="profile">{{ profile }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-2 d-flex align-items-end">
+                    <button type="submit" class="btn w-100" :class="{ 'btn-danger': status, 'btn-primary': !status }">{{ statusText }}</button>
+                  </div>
+                </div>
+              </form>
+              <div class="row mt-2">
+                <div v-if="config.mode !== 5" class="col-md-6 mb-2">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status" id="tun2socks-legacy">
+                    <label class="form-check-label" for="tun2socks-legacy">Use tun2socks legacy</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status" id="autostart">
+                    <label class="form-check-label" for="autostart">Auto start Libernet on boot</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status" id="dns-resolver">
+                    <label class="form-check-label" for="dns-resolver">DNS resolver</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="config.system.system.memory_cleaner" :disabled="status" id="memory-cleaner">
+                    <label class="form-check-label" for="memory-cleaner">Memory cleaner</label>
+                  </div>
+                </div>
+                <div class="col-md-12 mb-2">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.ping_loop" :disabled="status" id="ping-loop">
+                    <label class="form-check-label" for="ping-loop">PING loop</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <i class="fa fa-flag"></i>
+                  <span class="text-primary">Status: </span>
+                  <span :class="{
+                    'text-primary': connection === 0,
+                    'text-warning': connection === 1,
+                    'text-success': connection === 2,
+                    'text-info': connection === 3
+                  }">{{ connectionText }}</span>
+                  <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <i class="fa fa-server"></i>
+                  <span class="text-primary">IP: <span id="wan-ip"></span></span>
+                </div>
+                <div class="col-md-6 mb-2 d-flex align-items-center">
+                  <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
+                    <span class="ping-heartbeat" id="ping-heartbeat"></span>
+                  </i>
+                  <span class="text-primary">Ping: <span id="wan-ping"></span> ms</span>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <i class="fa fa-flag-o"></i>
+                  <span class="text-primary">ISP: <span id="wan-net"></span> (<span id="wan-country"></span>)</span>
+                </div>
+                <div class="col-12 mb-2">
+                  <button class="btn btn-sm btn-outline-info" id="refresh-wan-btn" type="button">
+                    <i class="fa fa-refresh"></i> Refresh Info
+                  </button>
+                </div>
+                <div class="col-12 pt-2">
+                  <pre ref="log" v-html="log"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue 3, Bootstrap JS, and Dashboard Logic -->
+  <script src="https://unpkg.com/vue@3"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script>
+  // Simulated Vue data for demo. Replace with your actual logic.
+  const app = Vue.createApp({
+    data() {
+      return {
+        config: {
+          mode: 0,
+          profile: '',
+          temp: {
+            modes: [
+              {value: 0, name: 'Mode 0'},
+              {value: 1, name: 'Mode 1'},
+              {value: 5, name: 'Mode 5'}
+            ]
+          },
+          profiles: ['Default', 'Profile1', 'Profile2'],
+          system: {
+            tun2socks: { legacy: false },
+            tunnel: { autostart: false, dns_resolver: false, ping_loop: false },
+            system: { memory_cleaner: false }
+          }
+        },
+        status: false,
+        statusText: 'Start',
+        connection: 0, // 0: idle, 1: connecting, 2: connected, 3: error
+        connectionText: 'Idle',
+        connectedTime: '',
+        log: 'Libernet log will appear here...\n'
+      }
+    },
+    methods: {
+      runLibernet() {
+        this.status = !this.status;
+        this.statusText = this.status ? 'Stop' : 'Start';
+        this.connection = this.status ? 2 : 0;
+        this.connectionText = this.status ? 'Connected' : 'Idle';
+        if (this.status) {
+          this.connectedTime = '00:00:01';
+          this.log += 'Libernet started...\n';
+        } else {
+          this.connectedTime = '';
+          this.log += 'Libernet stopped.\n';
+        }
+      }
+    }
+  });
+  app.mount('#app');
+  </script>
+  <script>
+  // WAN Info and Ping Logic
+  async function fetchWithTimeout(resource, options = {}) {
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+    const id = setTimeout(() => controller.abort(), 5000);
     options.signal = controller.signal;
     try {
-        const response = await fetch(resource, options);
-        clearTimeout(id);
-        return response;
+      const response = await fetch(resource, options);
+      clearTimeout(id);
+      return response;
     } catch (e) {
-        clearTimeout(id);
-        throw e;
+      clearTimeout(id);
+      throw e;
     }
-}
+  }
 
-async function fetchWanInfo() {
+  async function fetchWanInfo() {
     const ipElem = document.getElementById('wan-ip');
     const netElem = document.getElementById('wan-net');
     const countryElem = document.getElementById('wan-country');
     const btn = document.getElementById('refresh-wan-btn');
     const setFields = (ip, isp, country) => {
-        ipElem.textContent = ip || 'Unavailable';
-        netElem.textContent = isp || 'Unavailable';
-        countryElem.textContent = country || 'Unavailable';
+      ipElem.textContent = ip || 'Unavailable';
+      netElem.textContent = isp || 'Unavailable';
+      countryElem.textContent = country || 'Unavailable';
     };
     if (btn) btn.disabled = true;
     setFields('Loading...', 'Loading...', 'Loading...');
     try {
-        try {
-            const resp1 = await fetchWithTimeout('http://ip-api.com/json/');
-            if (!resp1.ok) throw new Error('ip-api.com unavailable');
-            const data1 = await resp1.json();
-            if (data1.status === 'success') {
-                setFields(data1.query, data1.isp, data1.country);
-                return;
-            }
-        } catch (e) {}
-        try {
-            const resp2 = await fetchWithTimeout('https://api.ipapi.is/?q=');
-            if (!resp2.ok) throw new Error('ipapi.is unavailable');
-            const data2 = await resp2.json();
-            setFields(
-                data2.ip,
-                data2.company && data2.company.name ? data2.company.name : 'Unavailable',
-                data2.location && data2.location.country ? data2.location.country : 'Unavailable'
-            );
-        } catch (e) {
-            setFields('Unavailable', 'Unavailable', 'Unavailable');
+      try {
+        const resp1 = await fetchWithTimeout('https://ip-api.com/json/');
+        if (!resp1.ok) throw new Error('ip-api.com unavailable');
+        const data1 = await resp1.json();
+        if (data1.status === 'success') {
+          setFields(data1.query, data1.isp, data1.country);
+          return;
         }
-    } catch (e) {
+      } catch (e) {}
+      try {
+        const resp2 = await fetchWithTimeout('https://api.ipapi.is/?q=');
+        if (!resp2.ok) throw new Error('ipapi.is unavailable');
+        const data2 = await resp2.json();
+        setFields(
+          data2.ip,
+          data2.company && data2.company.name ? data2.company.name : 'Unavailable',
+          data2.location && data2.location.country ? data2.location.country : 'Unavailable'
+        );
+      } catch (e) {
         setFields('Unavailable', 'Unavailable', 'Unavailable');
+      }
+    } catch (e) {
+      setFields('Unavailable', 'Unavailable', 'Unavailable');
     } finally {
-        if (btn) btn.disabled = false;
+      if (btn) btn.disabled = false;
     }
-}
+  }
 
-// Browser-based "ping" using image load time
-let pingTimeoutCount = 0;
-function showPingHeartbeat(active) {
+  // Browser-based "ping" using image load time
+  let pingTimeoutCount = 0;
+  function showPingHeartbeat(active) {
     const heartbeat = document.getElementById('ping-heartbeat');
     if (heartbeat) heartbeat.style.display = active ? 'block' : 'none';
-}
-function updatePing() {
+  }
+  function updatePing() {
     var pingElem = document.getElementById('wan-ping');
     showPingHeartbeat(true);
     pingElem.textContent = "...";
@@ -235,41 +338,45 @@ function updatePing() {
     var img = new window.Image();
     var finished = false;
     img.onload = img.onerror = function() {
-        if (finished) return;
-        finished = true;
-        showPingHeartbeat(false);
-        var latency = Date.now() - start;
-        if (latency < 5000) {
-            pingTimeoutCount = 0;
-            pingElem.textContent = latency;
-        } else {
-            pingTimeoutCount++;
-            pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
-        }
+      if (finished) return;
+      finished = true;
+      showPingHeartbeat(false);
+      var latency = Date.now() - start;
+      if (latency < 5000) {
+        pingTimeoutCount = 0;
+        pingElem.textContent = latency;
+      } else {
+        pingTimeoutCount++;
+        pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
+      }
     };
     img.src = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png?cachebust=" + Math.random();
     setTimeout(function() {
-        if (!finished) {
-            finished = true;
-            showPingHeartbeat(false);
-            pingTimeoutCount++;
-            pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
-        }
+      if (!finished) {
+        finished = true;
+        showPingHeartbeat(false);
+        pingTimeoutCount++;
+        pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
+      }
     }, 5000);
-}
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     fetchWanInfo();
     updatePing();
-    var btn = document.getElementById('refresh-wan-btn');
-    if (btn) btn.addEventListener('click', function(e) {
+    const btn = document.getElementById('refresh-wan-btn');
+    if (btn) {
+      btn.addEventListener('click', function(e) {
         e.preventDefault();
         fetchWanInfo();
         updatePing();
-    });
-    setInterval(fetchWanInfo, 300000); // Refresh WAN info every 5 min
-    setInterval(updatePing, 10000);    // Refresh ping every 10 sec
-});
-</script>
+      });
+      // Auto-click refresh every 5 seconds
+      setInterval(() => {
+        btn.click();
+      }, 5000);
+    }
+  });
+  </script>
 </body>
 </html>
