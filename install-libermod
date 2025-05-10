@@ -17,6 +17,7 @@ echo -e "Sebelum Install Libernet Mod Pastikan Anda Sudah Install Libernet by Lu
 sleep 1
 echo -e "- Add Ping"
 echo -e "- Add Refresh WAN Button"
+echo -e "- Add Libernet Mod in List Services"
 echo -e "- Remove Login Page"
 echo -e "- Remove Speedtest Page"
 echo -e "- Remove TX|RX"
@@ -67,7 +68,6 @@ echo "Downloading modified files..."
 } &> log-install.txt
 
 # Add LuCI integration
-echo "Adding LuCI service integration..."
 {
 cat <<'EOF' > /usr/lib/lua/luci/view/libernet.htm
 <!DOCTYPE html>
