@@ -4,7 +4,6 @@
 <!-- Font Awesome -->
 <link rel="stylesheet" href="css/font-awesome.min.css">
 <!-- Bootstrap CSS -->
-<link rel="stylesheet" href="lib/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="bootstrap.min.css">
 <link rel="stylesheet" href="custom-theme.css">
 <!-- Main CSS -->
