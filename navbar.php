@@ -2,65 +2,27 @@
     $url_array = explode('/', $_SERVER['REQUEST_URI']);
     $url = end($url_array);
 ?>
-<!-- Add Font Awesome CDN if not already included -->
+<!-- Font Awesome CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
-    body {
-        margin: 0;
-        padding-top: 56px; /* adjust if menu height changes */
-        font-family: Arial, sans-serif;
-    }
+    body { margin: 0; padding-top: 56px; font-family: Arial, sans-serif; }
     .fixed-menu {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: #11195b;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: flex;
-        z-index: 1030;
+        position: fixed; top: 0; left: 0; width: 100%;
+        background: #11195b; margin: 0; padding: 0;
+        list-style: none; display: flex; z-index: 1030;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    .fixed-menu li {
-        margin: 0;
-    }
+    .fixed-menu li { margin: 0; }
     .fixed-menu a {
-        display: block;
-        color: #fff;
-        padding: 16px 24px;
-        text-decoration: none;
-        font-size: 16px;
-        transition: background 0.2s;
+        display: block; color: #fff !important; padding: 16px 24px;
+        text-decoration: none; font-size: 16px; transition: background 0.2s;
     }
-    .fixed-menu a.active,
-    .fixed-menu a:hover {
-        background: #222b7b;
-        color: #fff;
+    .fixed-menu a.active, .fixed-menu a:hover { 
+        background: #222b7b; 
+        color: #fff !important; 
     }
     @media (max-width: 600px) {
-        .fixed-menu a {
-            padding: 14px 12px;
-            font-size: 15px;
-        }
+        .fixed-menu a { padding: 14px 12px; font-size: 15px; }
     }
 </style>
-
-<ul class="fixed-menu">
-    <li>
-        <a href="index.php" <?php if ($url === 'index.php') echo 'class="active"'; ?>>
-            <i class="fa fa-home"></i> Home
-        </a>
-    </li>
-    <li>
-        <a href="config.php" <?php if ($url === 'config.php') echo 'class="active"'; ?>>
-            <i class="fa fa-gear"></i> Configuration
-        </a>
-    </li>
-    <li>
-        <a href="about.php" <?php if ($url === 'about.php') echo 'class="active"'; ?>>
-            <i class="fa fa-info"></i> About
-        </a>
-    </li>
-</ul>
+<ul class="fixed-menu"><li><a href="index.php"<?php if ($url === 'index.php') echo ' class="active"'; ?>><i class="fa fa-home"></i> Home</a></li><li><a href="config.php"<?php if ($url === 'config.php') echo ' class="active"'; ?>><i class="fa fa-gear"></i> Configuration</a></li><li><a href="about.php"<?php if ($url === 'about.php') echo ' class="active"'; ?>><i class="fa fa-info"></i> About</a></li></ul>
