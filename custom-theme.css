@@ -1,0 +1,105 @@
+:root {
+  --primary: #f04b20;
+  --secondary: #009cab;
+  --success: #4caf50;
+  --info: #00bcd4;
+  --warning: #f0cf1f;
+  --danger: #f44336;
+  --light: #f8f9fa;
+  --dark: #546363;
+  --white: #fff;
+  --gray: #bbc1c1;
+  --gray-dark: #546363;
+}
+
+/* Body background and text */
+body {
+  background-color: var(--light) !important;
+  color: var(--dark) !important;
+}
+
+/* Navbar */
+.navbar, .navbar-light, .navbar-dark {
+  background-color: var(--primary) !important;
+  color: var(--white) !important;
+}
+.navbar .navbar-brand, .navbar .nav-link {
+  color: var(--white) !important;
+}
+.navbar .nav-link:hover, .navbar .nav-link:focus {
+  color: var(--warning) !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--white) !important;
+}
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #d8441d !important;
+  border-color: #c03c1a !important;
+}
+
+.btn-secondary {
+  background-color: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  color: var(--white) !important;
+}
+.btn-secondary:hover, .btn-secondary:focus {
+  background-color: #008c9a !important;
+  border-color: #007d89 !important;
+}
+
+/* Alerts */
+.alert-primary {
+  background-color: var(--primary) !important;
+  color: var(--white) !important;
+  border: none !important;
+}
+.alert-success {
+  background-color: var(--success) !important;
+  color: var(--white) !important;
+  border: none !important;
+}
+.alert-danger {
+  background-color: var(--danger) !important;
+  color: var(--white) !important;
+  border: none !important;
+}
+
+/* Cards */
+.card {
+  background-color: var(--secondary) !important;
+  color: var(--white) !important;
+  border: none !important;
+}
+.card-header {
+  background-color: var(--primary) !important;
+  color: var(--white) !important;
+}
+
+/* Links */
+a {
+  color: var(--primary) !important;
+}
+a:hover, a:focus {
+  color: var(--danger) !important;
+}
+
+/* Table */
+.table-primary, .table-primary > th, .table-primary > td {
+  background-color: #f9b7a6 !important;
+  color: var(--dark) !important;
+}
+
+/* Form Controls */
+.form-control {
+  background-color: var(--light) !important;
+  color: var(--dark) !important;
+  border: 1px solid var(--primary) !important;
+}
+.form-control:focus {
+  border-color: var(--secondary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(240,75,32,.25) !important;
+}
