@@ -89,6 +89,7 @@
                         </form>
                             <div class="row">
                                 <!-- Checkbox settings: always fixed -->
+				<br>
                                 <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy">
@@ -97,6 +98,7 @@
                                         </label>
                                     </div>
                                 </div>
+				    <br>
                                 <div class="col-lg-6 col-md-6 pb-lg-1">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
