@@ -66,17 +66,15 @@ LUCI_THEME_DIR="/www/static/$THEME_NAME"
 LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
 LUCI_VIEW="/usr/lib/lua/luci/view/libernet-view.htm"
 
-# Ensure /www/static exists before symlinking
-mkdir -p /www/static
+# Clean up previous theme directory to avoid conflicts and loops
+rm -rf "$LUCI_THEME_DIR"
+mkdir -p "$LUCI_THEME_DIR/styles"
 
 # Download and install favicon for all pages
-mkdir -p "$LUCI_THEME_DIR/htdocs"
-wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
-ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
+wget -O "/www/favicon.ico" "$FAVICON_URL"
 
 # Create theme CSS with improved result box styling, white navbar toggler, and unified icon color
-mkdir -p "$LUCI_THEME_DIR/static/styles"
-cat > "$LUCI_THEME_DIR/static/styles/libernet.css" <<EOF
+cat > "$LUCI_THEME_DIR/styles/libernet.css" <<EOF
 body {
     background: url('$BG_URL') no-repeat center center fixed;
     background-size: cover;
@@ -116,10 +114,7 @@ pre[ref="log"] {
 }
 EOF
 
-# Link theme resources with proper symlink handling
-ln -sfn "$LUCI_THEME_DIR/static" "/www/static/$THEME_NAME"
-
-# Make sure head.php always sets the background for all pages, loads Font Awesome, and uses the icon-cyan class
+# Update head.php to reference the CSS correctly
 cat > /www/libernet/head.php <<EOF
 <?php
 echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
@@ -131,7 +126,9 @@ body { min-height: 100vh !important; }
 ?>
 EOF
 
-# LuCI controller and view for menu integration
+# ---------------------------
+# LuCI Integration
+# ---------------------------
 mkdir -p /usr/lib/lua/luci/controller
 cat > "$LUCI_CONTROLLER" <<EOF
 module("luci.controller.libernet", package.seeall)
