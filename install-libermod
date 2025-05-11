@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons + Directory Backup)
+# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons + Directory Backup + Favicon)
 
 set -e
 
@@ -12,6 +12,7 @@ LIBERNET_DIR="/www/libernet"
 BACKUP_DIR="/www/libernet_backup_$(date +%s)"
 GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
 REMOTE_BG="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/re.jpg"
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/icon.ico"
 
 # ---------------------------
 # Root Check
@@ -93,6 +94,9 @@ echo -e "\n\033[1;34mApplying custom theme...\033[0m"
 # Create libernet directory if missing
 mkdir -p "$LIBERNET_DIR"
 
+# Download favicon to /www/favicon.ico (optional, for browser default)
+wget -O /www/favicon.ico "$FAVICON_URL"
+
 # Write custom bootstrap.min.css
 cat > "${LIBERNET_DIR}/bootstrap.min.css" <<EOF
 body, .container, .container-fluid {
@@ -148,6 +152,8 @@ EOF
 # Write custom head.php
 cat > "${LIBERNET_DIR}/head.php" <<EOF
 <?php
+echo '<link rel="icon" type="image/x-icon" href="$FAVICON_URL">';
+echo '<link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">';
 echo '<style>
   html, body, .container, .container-fluid {
     background: transparent !important;
@@ -224,6 +230,8 @@ cat > "$LUCI_VIEW" <<EOF
 <head>
   <title>Libernet Mod | Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/x-icon" href="$FAVICON_URL">
+  <link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">
   <style>
     html, body {
       height: 100%;
