@@ -5,6 +5,8 @@
         $title = "Home";
         include("head.php");
     ?>
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
@@ -144,7 +146,7 @@
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
-								    <i class="fa fa-flag-o"></i>
+								    <i class="fa fa-flag"></i>
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
                                 </div>
                                 <!-- End WAN Info Section -->
