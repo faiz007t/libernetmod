@@ -90,7 +90,8 @@
                     </div>
                 </div>
                 <!-- System Controls & Status Full-Width Card -->
-                <div class="card mb-4 w-100">
+                <div class="col-lg-8 col-md-9 mx-auto mt-3">
+                <div class="card mb-4">
                     <div class="card-header text-center">
                         <i class="fa fa-cogs"></i> <strong>System Controls & Status</strong>
                     </div>
