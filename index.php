@@ -75,7 +75,7 @@
                                         <label class="my-auto" >Config</label>
 									</div>
                                     <div class="col">
-                                        <select class="form-control " v-model="config.profile" :disabled="status === true" required>
+                                        <select class="form-control" v-model="config.profile" :disabled="status === true" required>
                                             <option v-for="profile in config.profiles" :value="profile">{{ profile }}</option>
                                         </select>
                                     </div>
@@ -88,9 +88,10 @@
                             </div>
                         </form>
                             <div class="row">
+                                <!-- Checkbox settings: always fixed -->
                                 <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy" >
+                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy">
                                         <label class="form-check-label" for="tun2socks-legacy">
                                             Use tun2socks legacy
                                         </label>
@@ -128,7 +129,7 @@
                                         </label>
                                     </div>
                                 </div>
-                                <!-- Status with dynamic icon -->
+                                <!-- Status: Always first -->
                                 <div class="col-lg-6 col-md-6">
                                     <i :class="{
                                         'fa fa-circle text-muted': connection === 0,
@@ -145,18 +146,19 @@
                                     }">{{ connectionText }}</span>
                                     <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                 </div>
-                                <!-- WAN Info Section (HTML + JS) -->
-                                <div class="col-lg-6 col-md-6">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
-                                </div>
-                                <!-- Ping Section -->
+                                <!-- Ping: Always second -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
                                     <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
                                         <span class="ping-heartbeat" id="ping-heartbeat"></span>
                                     </i>
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
+                                <!-- IP: Always third -->
+                                <div class="col-lg-6 col-md-6">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
+                                </div>
+                                <!-- ISP: Always fourth -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1">
                                     <i class="fa fa-server"></i>
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
