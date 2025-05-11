@@ -1,23 +1,5 @@
 #!/bin/bash
-# Libermod Installer by Hanif Widi Widodo + Advanced LuCI Integration
 
-set -e
-
-# ---------------------------
-# Configuration Variables
-# ---------------------------
-LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
-LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
-LIBERNET_DIR="/www/libernet"
-BACKUP_DIR="/www/libernet_backup_$(date +%s)"
-GITHUB_BASE="https://raw.githubusercontent.com/hanifwidi17/libermod/main"
-REMOTE_BG="https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg"
-FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/icon.ico"
-MUSIC_URL="https://raw.githubusercontent.com/hanifwidi17/libermod/main/music.mp3"
-
-# ---------------------------
-# Welcome & Info
-# ---------------------------
 clear
 echo -e "#############################################"
 echo -e "#  Libermod Installer by Hanif Widi Widodo  #"
@@ -42,332 +24,41 @@ echo -e "##"
 sleep 1
 echo -e "###"
 sleep 2
-
-# ---------------------------
-# Dependency Check
-# ---------------------------
-check_dependency() {
-    if ! command -v $1 &> /dev/null; then
-        echo -e "\033[1;33mInstalling dependency: $1...\033[0m"
-        opkg update && opkg install $1
-    fi
-}
-check_dependency unzip
-check_dependency wget
-
-# ---------------------------
-# Backup Existing Installation (as Directory)
-# ---------------------------
-if [ -d "$LIBERNET_DIR" ]; then
-    echo -e "\n\033[1;33mCreating backup of previous installation...\033[0m"
-    cp -r "$LIBERNET_DIR" "$BACKUP_DIR"
-    echo -e "Backup saved at: $BACKUP_DIR\n"
-fi
-
-# ---------------------------
-# Download and Extract Main Package
-# ---------------------------
 echo -e "Downloading file..."
+{
 opkg install unzip
-wget -O /www/libernet.zip --no-check-certificate "$GITHUB_BASE/libernet.zip"
-rm -rf /www/libernet
-echo -e "Extracting file..."
+wget -O /www/libernet.zip --no-check-certificate https://github.com/hanifwidi17/libermod/raw/main/libernet.zip
+rm -r /www/libernet
+} &> log-download.txt
+echo -e "Extacting file..."
+{
 unzip /www/libernet.zip -d /www
-
-# ---------------------------
-# Add Background Music
-# ---------------------------
-echo -e "Adding Background Music..."
-mkdir -p /www/libernet/music
-wget -O /www/libernet/music/music.mp3 --no-check-certificate "$MUSIC_URL"
-
-# ---------------------------
-# Mod & Change Theme Color, Background, System Files
-# ---------------------------
+} &> log-extract.txt
+sleep 2
+echo -e "Add Background Music..."
+{
+mkdir /www/libernet/music
+} &> log-install.txt
+sleep 2
 echo -e "Mod & Change Theme Color..."
-wget -O /www/libernet/system.php --no-check-certificate "$GITHUB_BASE/system.php"
-wget -O /www/libernet/navbar.php --no-check-certificate "$GITHUB_BASE/navbar.php"
-wget -O /www/libernet/index.php --no-check-certificate "$GITHUB_BASE/index.php"
-wget -O /www/libernet/head.php --no-check-certificate "$GITHUB_BASE/head.php"
-wget -O /www/libernet/footer.php --no-check-certificate "$GITHUB_BASE/footer.php"
-wget -O /www/libernet/config.php --no-check-certificate "$GITHUB_BASE/config.php"
-wget -O /www/libernet/about.php --no-check-certificate "$GITHUB_BASE/about.php"
-wget -O /www/libernet/img/re.jpg --no-check-certificate "$GITHUB_BASE/re.jpg"
-wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate "$GITHUB_BASE/re.jpg"
-wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate "$GITHUB_BASE/bootstrap.min.css"
-wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate "$GITHUB_BASE/ping-loop.sh"
-
-# ---------------------------
-# Download favicon for all LuCI and browser pages
-# ---------------------------
-wget -O /www/favicon.ico "$FAVICON_URL"
-
-# ---------------------------
-# Custom Theme: CSS and head.php
-# ---------------------------
-cat > "${LIBERNET_DIR}/bootstrap.min.css" <<EOF
-body, .container, .container-fluid {
-  background: transparent !important;
-  color: #000 !important;
-}
-.panel-default, .panel {
-  background: rgba(255,255,255,0.3) !important;
-  border-color: #333 !important;
-  color: #000 !important;
-}
-.btn-default {
-  background-color: #001f3f !important;
-  border-color: #001f3f !important;
-  color: #000 !important;
-}
-.form-control {
-  background: rgba(255,255,255,0.1) !important;
-  color: #000 !important;
-  border-color: #333 !important;
-}
-.navbar, .navbar-default {
-  background-color: #001f3f !important;
-  border-color: #001f3f !important;
-  color: #fff !important;
-}
-/* Make toggler/hamburger icon white */
-.navbar .navbar-toggler .navbar-toggler-icon,
-.navbar-default .navbar-toggler .navbar-toggler-icon,
-.navbar .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'><path stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/></svg>");
-}
-.icon-bar {
-  background-color: #fff !important;
-}
-/* Make back icon in navbar white (if any) */
-.navbar .back-icon svg,
-.navbar .navbar-back svg,
-.navbar .navbar-back-icon svg {
-  fill: #fff !important;
-}
-.navbar .back-icon,
-.navbar .navbar-back,
-.navbar .navbar-back-icon {
-  color: #fff !important;
-}
-html {
-  background: url("$REMOTE_BG") no-repeat center center fixed !important;
-  background-size: cover !important;
-}
-EOF
-
-cat > "${LIBERNET_DIR}/head.php" <<EOF
-<?php
-echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
-echo '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">';
-echo '<link rel="icon" type="image/x-icon" href="$FAVICON_URL">';
-echo '<link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">';
-echo '<style>
-  html, body, .container, .container-fluid {
-    background: transparent !important;
-    color: #000 !important;
-  }
-  html {
-    background: url("$REMOTE_BG") no-repeat center center fixed !important;
-    background-size: cover !important;
-  }
-  .panel-default, .panel {
-    background: rgba(255,255,255,0.3) !important;
-    border-color: #333 !important;
-    color: #000 !important;
-  }
-  .btn-default {
-    background-color: #001f3f !important;
-    border-color: #001f3f !important;
-    color: #000 !important;
-  }
-  .form-control {
-    background: rgba(255,255,255,0.1) !important;
-    color: #000 !important;
-    border-color: #333 !important;
-  }
-  .navbar, .navbar-default {
-    background-color: #001f3f !important;
-    border-color: #001f3f !important;
-    color: #fff !important;
-  }
-  /* Make toggler/hamburger icon white */
-  .navbar .navbar-toggler .navbar-toggler-icon,
-  .navbar-default .navbar-toggler .navbar-toggler-icon,
-  .navbar .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;utf8,<svg viewBox=\'0 0 30 30\' xmlns=\'http://www.w3.org/2000/svg\'><path stroke=\'rgba(255,255,255,1)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' d=\'M4 7h22M4 15h22M4 23h22\'/></svg>");
-  }
-  .icon-bar {
-    background-color: #fff !important;
-  }
-  /* Make back icon in navbar white (if any) */
-  .navbar .back-icon svg,
-  .navbar .navbar-back svg,
-  .navbar .navbar-back-icon svg {
-    fill: #fff !important;
-  }
-  .navbar .back-icon,
-  .navbar .navbar-back,
-  .navbar .navbar-back-icon {
-    color: #fff !important;
-  }
-</style>';
-?>
-EOF
-
-# ---------------------------
-# LuCI Integration (Custom View)
-# ---------------------------
-echo -e "\n\033[1;34mCreating LuCI integration...\033[0m"
-
-mkdir -p "$(dirname "$LUCI_CONTROLLER")"
-mkdir -p "$(dirname "$LUCI_VIEW")"
-
-cat > "$LUCI_CONTROLLER" <<'EOF'
-module("luci.controller.libernet", package.seeall)
-
-function index()
-    entry({"admin", "services", "libernet"}, template("libernet"), _("Libernet"), 55).leaf = true
-end
-EOF
-
-cat > "$LUCI_VIEW" <<EOF
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Libernet Mod | Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/x-icon" href="$FAVICON_URL">
-  <link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: url("$REMOTE_BG") no-repeat center center fixed !important;
-      background-size: cover !important;
-      color: #000 !important;
-      touch-action: manipulation;
-    }
-    #libernet {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-      background: transparent;
-      color: #000 !important;
-    }
-    #luci-back {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: rgba(30,30,30,0.85);
-      border: none;
-      border-radius: 50%;
-      padding: 8px;
-      width: 48px;
-      height: 48px;
-      cursor: pointer;
-      transition: all 0.2s;
-      touch-action: manipulation;
-    }
-    #luci-back svg {
-      width: 28px;
-      height: 28px;
-      fill: #fff !important;
-      color: #fff !important;
-      /* This ensures the back icon is always white */
-    }
-    @media (max-width: 768px) {
-      #luci-back {
-        width: 44px;
-        height: 44px;
-        top: 8px;
-        left: 8px;
-      }
-      #luci-back svg {
-        width: 24px;
-        height: 24px;
-      }
-    }
-    /* Ensure text inside boxes is black */
-    .panel-default, .panel, .btn-default, .form-control {
-      color: #000 !important;
-    }
-    .navbar, .navbar-default {
-      background-color: #001f3f !important;
-      border-color: #001f3f !important;
-      color: #fff !important;
-    }
-    /* Make toggler/hamburger icon white */
-    .navbar .navbar-toggler .navbar-toggler-icon,
-    .navbar-default .navbar-toggler .navbar-toggler-icon,
-    .navbar .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'><path stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/></svg>");
-    }
-    .icon-bar {
-      background-color: #fff !important;
-    }
-    /* Make back icon in navbar white (if any) */
-    .navbar .back-icon svg,
-    .navbar .navbar-back svg,
-    .navbar .navbar-back-icon svg {
-      fill: #fff !important;
-    }
-    .navbar .back-icon,
-    .navbar .navbar-back,
-    .navbar .navbar-back-icon {
-      color: #fff !important;
-    }
-  </style>
-</head>
-<body>
-  <button id="luci-back"
-          role="button"
-          aria-label="Return to LuCI interface"
-          onclick="window.location.href='http://' + window.location.hostname + '/cgi-bin/luci/'">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#fff">
-      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-    </svg>
-  </button>
-
-  <iframe id="libernet" scrolling="auto"></iframe>
-
-  <script>
-    document.getElementById("libernet").src = "http://" + window.location.hostname + "/libernet";
-  </script>
-</body>
-</html>
-EOF
-
-# ---------------------------
-# Final Configuration
-# ---------------------------
-echo -e "\n\033[1;34mSetting file permissions...\033[0m"
-chmod 644 "$LUCI_CONTROLLER"
-chmod 644 "$LUCI_VIEW"
-
-echo -e "\n\033[1;34mRestarting web service...\033[0m"
-/etc/init.d/uhttpd restart
-
-# ---------------------------
-# Cleanup
-# ---------------------------
-echo -e "\n\033[1;34mCleaning up installation files...\033[0m"
-rm -f "/www/libernet.zip"
-rm -f "$0"
-
-# ---------------------------
-# Completion Message
-# ---------------------------
-echo -e "\n\033[1;32mPROSES PEMASANGAN LIBERMOD SELESAI!\033[0m"
+{
+wget -O /www/libernet/music/music.mp3 --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/music.mp3
+wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
+wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
+wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/index.php
+wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
+wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
+wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
+wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
+wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg
+wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg
+wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/bootstrap.min.css
+wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/ping-loop.sh
+} &> log-install.txt
+rm /www/libernet.zip
+rm install-libermod
+echo -e ""
+echo -e ""
+echo -e "PROSES PEMASANGAN LIBERMOD SELESAI!"
 echo -e "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
 echo -e ""
-echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[1;34mhttp://\$(uci get network.lan.ipaddr)/libernet\033[0m"
-echo -e "2. LuCI Interface: Services Menu -> Libernet"
-echo -e "- Check installation log at: install.log"
-echo -e "- Backup important configurations\n"
