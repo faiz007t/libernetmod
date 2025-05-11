@@ -102,21 +102,21 @@ body, .container, .container-fluid {
 .panel-default, .panel {
   background: rgba(255,255,255,0.3) !important;
   border-color: #333 !important;
-  color: #fff !important;
+  color: #000 !important;
 }
 .btn-default {
-  background-color: #1976d2 !important;
-  border-color: #1565c0 !important;
-  color: #fff !important;
+  background-color: #001f3f !important;
+  border-color: #001f3f !important;
+  color: #000 !important;
 }
 .form-control {
   background: rgba(255,255,255,0.1) !important;
-  color: #fff !important;
+  color: #000 !important;
   border-color: #333 !important;
 }
 .navbar, .navbar-default {
-  background-color: #1976d2 !important;
-  border-color: #1565c0 !important;
+  background-color: #001f3f !important;
+  border-color: #001f3f !important;
   color: #000 !important;
 }
 html {
@@ -140,21 +140,21 @@ echo '<style>
   .panel-default, .panel {
     background: rgba(255,255,255,0.3) !important;
     border-color: #333 !important;
-    color: #fff !important;
+    color: #000 !important;
   }
   .btn-default {
-    background-color: #1976d2 !important;
-    border-color: #1565c0 !important;
-    color: #fff !important;
+    background-color: #001f3f !important;
+    border-color: #001f3f !important;
+    color: #000 !important;
   }
   .form-control {
     background: rgba(255,255,255,0.1) !important;
-    color: #fff !important;
+    color: #000 !important;
     border-color: #333 !important;
   }
   .navbar, .navbar-default {
-    background-color: #1976d2 !important;
-    border-color: #1565c0 !important;
+    background-color: #001f3f !important;
+    border-color: #001f3f !important;
     color: #000 !important;
   }
 </style>';
@@ -234,9 +234,9 @@ cat > "$LUCI_VIEW" <<EOF
         height: 24px;
       }
     }
-    /* Ensure text inside boxes is white */
+    /* Ensure text inside boxes is black */
     .panel-default, .panel, .btn-default, .form-control {
-      color: #fff !important;
+      color: #000 !important;
     }
   </style>
 </head>
