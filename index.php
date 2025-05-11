@@ -90,16 +90,16 @@
                         <!-- BEGIN: Box UI for Settings and Status -->
                         <div class="card mt-3">
                             <div class="card-header text-center">
-                                <strong>System Controls & Status</strong>
+                                <strong><i class="fa fa-cogs"></i> System Controls & Status</strong>
                             </div>
                             <div class="card-body">
                                 <div class="row">
-                                    <!-- Checkbox settings -->
+                                    <!-- Checkbox settings with icons -->
                                     <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
                                         <div class="form-check form-switch">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy">
                                             <label class="form-check-label" for="tun2socks-legacy">
-                                                Use tun2socks legacy
+                                                <i class="fa fa-exchange"></i> Use tun2socks legacy
                                             </label>
                                         </div>
                                     </div>
@@ -107,7 +107,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
                                             <label class="form-check-label" for="autostart">
-                                                Auto start Libernet on boot
+                                                <i class="fa fa-play-circle"></i> Auto start Libernet on boot
                                             </label>
                                         </div>
                                     </div>
@@ -115,7 +115,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status === true" id="dns-resolver">
                                             <label class="form-check-label" for="dns-resolver">
-                                                DNS resolver
+                                                <i class="fa fa-globe"></i> DNS resolver
                                             </label>
                                         </div>
                                     </div>
@@ -123,7 +123,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.system.memory_cleaner" :disabled="status === true" id="memory-cleaner">
                                             <label class="form-check-label" for="memory-cleaner">
-                                                Memory cleaner
+                                                <i class="fa fa-trash"></i> Memory cleaner
                                             </label>
                                         </div>
                                     </div>
@@ -131,7 +131,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.ping_loop" :disabled="status === true" id="ping-loop">
                                             <label class="form-check-label" for="ping-loop">
-                                                PING loop
+                                                <i class="fa fa-refresh"></i> PING loop
                                             </label>
                                         </div>
                                     </div>
