@@ -168,7 +168,7 @@
                                     <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
                                         <i class="fa fa-refresh"></i> Refresh Info
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" id="clear-log-btn">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @click="clearLog">
                                         <i class="fa fa-trash"></i> Clear
                                     </button>
                                 </div>
@@ -186,6 +186,25 @@
 </div>
 <?php include("javascript.php"); ?>
 <script src="js/index.js"></script>
+
+<!-- Vue instance with clearLog method -->
+<script>
+window.app = new Vue({
+    el: '#app',
+    data: {
+        // ... your other data ...
+        log: '',
+        // ... rest of your data ...
+        // Make sure all your data properties are here as in your original app
+    },
+    methods: {
+        clearLog() {
+            this.log = '';
+        }
+    }
+    // ... other Vue options, computed, mounted, etc. ...
+});
+</script>
 
 <!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
 <script>
@@ -273,19 +292,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchWanInfo();
         updatePing();
     });
-    // Clear log button logic
-    var clearBtn = document.getElementById('clear-log-btn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            // Vue reactive property
-            if (window.app && typeof window.app.log !== "undefined") {
-                window.app.log = '';
-            }
-            // Always clear the <pre> directly as well
-            var logBox = document.querySelector('pre[ref="log"]');
-            if (logBox) logBox.innerHTML = '';
-        });
-    }
     setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
     setInterval(updatePing, 5000);     // Refresh ping every 5 seconds
 });
