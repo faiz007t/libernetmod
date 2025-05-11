@@ -42,7 +42,7 @@ wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubuserco
 wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
 wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
 wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php
-wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
+wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
 wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
 wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
 wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
