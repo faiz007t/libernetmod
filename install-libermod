@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons)
+# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons + Directory Backup)
 
 set -e
 
@@ -45,7 +45,7 @@ check_dependency unzip
 check_dependency wget
 
 # ---------------------------
-# Backup Existing Installation
+# Backup Existing Installation (as Directory)
 # ---------------------------
 if [ -d "$LIBERNET_DIR" ]; then
     echo -e "\n\033[1;33mCreating backup of previous installation...\033[0m"
