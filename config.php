@@ -5,6 +5,42 @@
         $title = "Configuration";
         include("head.php");
     ?>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="icon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
+    <style>
+    body {
+        background-image: url('https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        height: 100%;
+        min-height: 100vh;
+    }
+    html {
+        height: 100%;
+    }
+    #ping-icon {
+        position: relative;
+    }
+    .ping-heartbeat {
+        position: absolute;
+        left: 0; top: 0;
+        width: 1em; height: 1em;
+        border-radius: 50%;
+        background: #17a2b8;
+        opacity: 0.6;
+        z-index: -1;
+        animation: ping-anim 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+        display: none;
+    }
+    @keyframes ping-anim {
+        0% { transform: scale(1); opacity: 0.6; }
+        80% { transform: scale(2); opacity: 0; }
+        100% { transform: scale(2); opacity: 0; }
+    }
+    </style>
 </head>
 <body>
 <div id="app">
