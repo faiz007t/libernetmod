@@ -42,11 +42,12 @@
         80% { transform: scale(2); opacity: 0; }
         100% { transform: scale(2); opacity: 0; }
     }
+    [v-cloak] { display: none; }
     </style>
 </head>
 <body>
-<div id="app">
-    <?php include('navbar.php'); ?>
+<?php include('navbar.php'); ?>
+<div id="app" v-cloak>
     <div class="container-fluid">
         <div class="row py-2">
             <div class="col-lg-8 col-md-9 mx-auto mt-3">
@@ -168,9 +169,9 @@
                 </div>
             </div>
         </div>
-        <?php include('footer.php'); ?>
     </div>
 </div>
+<?php include('footer.php'); ?>
 <?php include("javascript.php"); ?>
 <script src="js/index.js"></script>
 
