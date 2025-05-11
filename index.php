@@ -8,7 +8,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
-    <!-- Ensure Font Awesome is loaded -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
     body {
@@ -128,9 +128,21 @@
                                         </label>
                                     </div>
                                 </div>
+                                <!-- Status with dynamic icon -->
                                 <div class="col-lg-6 col-md-6">
-									<i class="fa fa-flag"></i>
-                                    <span class="text-primary">Status: </span><span :class="{ 'text-primary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }">{{ connectionText }}</span>
+                                    <i :class="{
+                                        'fa fa-circle text-muted': connection === 0,
+                                        'fa fa-spinner fa-spin text-info': connection === 1,
+                                        'fa fa-check-circle text-success': connection === 2,
+                                        'fa fa-exclamation-circle text-danger': connection === 3
+                                    }"></i>
+                                    <span class="text-primary">Status: </span>
+                                    <span :class="{
+                                        'text-muted': connection === 0,
+                                        'text-info': connection === 1,
+                                        'text-success': connection === 2,
+                                        'text-danger': connection === 3
+                                    }">{{ connectionText }}</span>
                                     <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                 </div>
                                 <!-- WAN Info Section (HTML + JS) -->
