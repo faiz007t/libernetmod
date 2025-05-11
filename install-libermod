@@ -196,8 +196,8 @@ body, .container, .container-fluid {
   border-color: #333 !important;
 }
 .navbar, .navbar-default {
-  background-color: #232323 !important;
-  border-color: #333 !important;
+  background-color: #1976d2 !important;  /* A nice blue */
+  border-color: #1565c0 !important;      /* Slightly darker blue border */
 }
 EOF
 
