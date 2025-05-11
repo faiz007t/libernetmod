@@ -1,6 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration
-# Combined script with enhanced error handling and styling
+# Libernet Mod Installer with LuCI Integration (Dark Theme Edition)
 
 set -e
 
@@ -17,7 +16,7 @@ GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
 # Root Check
 # ---------------------------
 if [[ "$EUID" -ne 0 ]]; then
-   echo "ERROR: Script must be run as root!" 
+   echo -e "\033[1;31mERROR: Script must be run as root!\033[0m" 
    exit 1
 fi
 
@@ -25,9 +24,9 @@ fi
 # Initialization
 # ---------------------------
 clear
-echo -e "##############################################"
-echo -e "#        Libernet Mod v1.5.4 Installer Pro   #"
-echo -e "##############################################\n"
+echo -e "\033[1;36m##############################################\033[0m"
+echo -e "\033[1;36m#        Libernet Mod v1.5.4 Installer Pro   #\033[0m"
+echo -e "\033[1;36m##############################################\033[0m\n"
 echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
 sleep 2
 
@@ -36,7 +35,7 @@ sleep 2
 # ---------------------------
 check_dependency() {
     if ! command -v $1 &> /dev/null; then
-        echo "Installing dependency: $1..."
+        echo -e "\033[1;33mInstalling dependency: $1...\033[0m"
         opkg update && opkg install $1
     fi
 }
@@ -48,7 +47,7 @@ check_dependency wget
 # Backup Existing Installation
 # ---------------------------
 if [ -d "$LIBERNET_DIR" ]; then
-    echo -e "\nCreating backup of previous installation..."
+    echo -e "\n\033[1;33mCreating backup of previous installation...\033[0m"
     cp -r "$LIBERNET_DIR" "$BACKUP_DIR"
     echo -e "Backup saved at: $BACKUP_DIR\n"
 fi
@@ -56,7 +55,7 @@ fi
 # ---------------------------
 # Main Installation
 # ---------------------------
-echo -e "\nStarting Libernet Mod installation process..."
+echo -e "\n\033[1;34mStarting Libernet Mod installation process...\033[0m"
 {
     echo -e "\nDownloading main package..."
     wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
@@ -87,9 +86,9 @@ echo -e "\nStarting Libernet Mod installation process..."
 } 2>&1 | tee install.log
 
 # ---------------------------
-# LuCI Integration
+# LuCI Integration (Dark Theme)
 # ---------------------------
-echo -e "\nCreating LuCI integration..."
+echo -e "\n\033[1;34mCreating LuCI integration...\033[0m"
 cat > $LUCI_CONTROLLER <<'EOF'
 module("luci.controller.libernet", package.seeall)
 
@@ -109,7 +108,8 @@ cat > $LUCI_VIEW <<'EOF'
       height: 100%;
       margin: 0;
       padding: 0;
-      background: #222;
+      background: #181818;
+      color: #e0e0e0;
       touch-action: manipulation;
     }
     #libernet {
@@ -117,13 +117,15 @@ cat > $LUCI_VIEW <<'EOF'
       height: 100vh;
       border: none;
       display: block;
+      background: #181818;
+      color: #e0e0e0;
     }
     #luci-back {
       position: fixed;
       top: 10px;
       left: 10px;
       z-index: 1000;
-      background: rgba(0,0,0,0.7);
+      background: rgba(30,30,30,0.85);
       border: none;
       border-radius: 50%;
       padding: 8px;
@@ -136,7 +138,7 @@ cat > $LUCI_VIEW <<'EOF'
     #luci-back svg {
       width: 28px;
       height: 28px;
-      fill: white;
+      fill: #e0e0e0;
     }
     @media (max-width: 768px) {
       #luci-back {
@@ -172,19 +174,79 @@ cat > $LUCI_VIEW <<'EOF'
 EOF
 
 # ---------------------------
+# Overwrite bootstrap.min.css with dark theme
+# ---------------------------
+cat > "${LIBERNET_DIR}/bootstrap.min.css" <<'EOF'
+body, .container, .container-fluid {
+  background-color: #181818 !important;
+  color: #e0e0e0 !important;
+}
+.panel-default, .panel {
+  background-color: #232323 !important;
+  border-color: #333 !important;
+}
+.btn-default {
+  background-color: #292929 !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+.form-control {
+  background-color: #232323 !important;
+  color: #e0e0e0 !important;
+  border-color: #333 !important;
+}
+.navbar, .navbar-default {
+  background-color: #232323 !important;
+  border-color: #333 !important;
+}
+EOF
+
+# ---------------------------
+# Overwrite head.php for dark theme
+# ---------------------------
+cat > "${LIBERNET_DIR}/head.php" <<'EOF'
+<?php
+echo '<style>
+  body, .container, .container-fluid {
+    background-color: #181818 !important;
+    color: #e0e0e0 !important;
+  }
+  .panel-default, .panel {
+    background-color: #232323 !important;
+    border-color: #333 !important;
+  }
+  .btn-default {
+    background-color: #292929 !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+  }
+  .form-control {
+    background-color: #232323 !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+  }
+  .navbar, .navbar-default {
+    background-color: #232323 !important;
+    border-color: #333 !important;
+  }
+</style>';
+?>
+EOF
+
+# ---------------------------
 # Final Configuration
 # ---------------------------
-echo -e "\nSetting file permissions..."
+echo -e "\n\033[1;34mSetting file permissions...\033[0m"
 chmod 644 $LUCI_CONTROLLER
 chmod 644 $LUCI_VIEW
 
-echo -e "\nRestarting web service..."
+echo -e "\n\033[1;34mRestarting web service...\033[0m"
 /etc/init.d/uhttpd restart
 
 # ---------------------------
 # Cleanup
 # ---------------------------
-echo -e "\nCleaning up installation files..."
+echo -e "\n\033[1;34mCleaning up installation files...\033[0m"
 rm -f "/www/libernet.zip"
 rm -f "$0"
 
@@ -193,7 +255,7 @@ rm -f "$0"
 # ---------------------------
 echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
 echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "1. Web Interface: \033[1;34mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
 echo -e "2. LuCI Interface: Services Menu -> Libernet"
 echo -e "\nDon't forget to:"
 echo -e "- Clear your browser cache"
