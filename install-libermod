@@ -152,6 +152,8 @@ EOF
 # Write custom head.php
 cat > "${LIBERNET_DIR}/head.php" <<EOF
 <?php
+echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
+echo '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">';
 echo '<link rel="icon" type="image/x-icon" href="$FAVICON_URL">';
 echo '<link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">';
 echo '<style>
@@ -230,6 +232,8 @@ cat > "$LUCI_VIEW" <<EOF
 <head>
   <title>Libernet Mod | Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/x-icon" href="$FAVICON_URL">
   <link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">
   <style>
