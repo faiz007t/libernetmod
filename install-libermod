@@ -37,10 +37,10 @@ unzip /www/libernet.zip -d /www
 sleep 2
 echo -e "Mod & Change Theme Color..."
 {
-wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
+wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
 wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
 wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/index.php
-wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
+wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
 wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
 wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
 wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
