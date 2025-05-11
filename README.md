@@ -1,3 +1,38 @@
+# Libernet Mod
+Libernet is open source web app for tunneling internet using SSH, V2Ray, Trojan, Shadowsocks, OpenVPN on OpenWRT with ease.
+
+## Requirements
+- bash
+- curl
+- screen
+- jq
+- Python 3
+- OpenSSH
+- sshpass
+- stunnel
+- V2Ray
+- Shadowsocks
+- go-tun2socks
+- badvpn-tun2socks (legacy)
+- dnsmasq
+- https-dns-proxy
+- php7
+- php7-cgi
+- php7-mod-session
+- php7-mod-json
+- httping
+- openvpn-openssl
+
+## Working Features:
+- SSH with proxy
+- SSH-SSL
+- V2Ray VMess
+- V2Ray VLESS
+- V2Ray Trojan
+- Trojan
+- Shadowsocks
+- OpenVPN
+
 # Libernet Mod 
 <li> Remove Login Page</li>
 <li> Remove Speedtest Page</li>
