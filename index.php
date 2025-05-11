@@ -164,12 +164,9 @@
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
                                 </div>
                                 <!-- End WAN Info Section -->
-                                <div class="col-12 mb-2">
+				<div class="col-12 mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
                                         <i class="fa fa-refresh"></i> Refresh Info
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" id="clear-log-btn">
-                                        <i class="fa fa-trash"></i> Clear
                                     </button>
                                 </div>
                                 <div class="col pt-2">
@@ -273,19 +270,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchWanInfo();
         updatePing();
     });
-    // Clear log button logic
-    var clearBtn = document.getElementById('clear-log-btn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            // Vue reactive property
-            if (window.app && typeof window.app.log !== "undefined") {
-                window.app.log = '';
-            }
-            // Always clear the <pre> directly as well
-            var logBox = document.querySelector('pre[ref="log"]');
-            if (logBox) logBox.innerHTML = '';
-        });
-    }
     setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
     setInterval(updatePing, 5000);     // Refresh ping every 5 seconds
 });
