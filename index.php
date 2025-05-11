@@ -5,6 +5,8 @@
         $title = "Home";
         include("head.php");
     ?>
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
@@ -45,7 +47,7 @@
 <body>
 <div id="app">
     <?php include('navbar.php'); ?>
-    <div class="container-fluid" >
+    <div class="container-fluid">
         <div class="row py-2">
             <div class="col-lg-8 col-md-9 mx-auto mt-3">
                 <div class="card">
@@ -55,40 +57,42 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-body py-0 px-0">
-						<form @submit.prevent="runLibernet">
+                        <hr>
+                        <!-- VUE FORM -->
+                        <form @submit.prevent="runLibernet">
                             <div class="form-group form-row my-auto">
                                 <div class="col-lg-4 col-md-4 form-row py-1">
                                     <div class="col-lg-4 col-md-3 my-auto">
                                         <label class="my-auto">Mode</label>
-									</div>
+                                    </div>
                                     <div class="col">
                                         <select class="form-control" v-model.number="config.mode" :disabled="status === true" required>
-                                            <option v-for="mode in config.temp.modes" :value="mode.value">{{ mode.name }}</option>
+                                            <option v-for="mode in sortedModes" :value="mode.value">{{ mode.name }}</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-4 form-row py-1">
                                     <div class="col-lg-4 col-md-3 my-auto">
-                                        <label class="my-auto" >Config</label>
-									</div>
+                                        <label class="my-auto">Config</label>
+                                    </div>
                                     <div class="col">
-                                        <select class="form-control " v-model="config.profile" :disabled="status === true" required>
+                                        <select class="form-control" v-model="config.profile" :disabled="status === true" required>
                                             <option v-for="profile in config.profiles" :value="profile">{{ profile }}</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col form-row py-1">
                                     <div class="col">
-                                       <button type="submit" class="btn" :class="{ 'btn-danger': status, 'btn-primary': !status }">{{ statusText }}</button>
+                                        <button type="submit" class="btn" :class="{ 'btn-danger': status, 'btn-primary': !status }">{{ statusText }}</button>
                                     </div>
                                 </div>
                             </div>
                         </form>
+                        <div class="card-body py-0 px-0">
                             <div class="row">
                                 <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy" >
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy">
                                         <label class="form-check-label" for="tun2socks-legacy">
                                             Use tun2socks legacy
                                         </label>
@@ -126,14 +130,16 @@
                                         </label>
                                     </div>
                                 </div>
+                                <!-- STATUS ICON SECTION (VUE REACTIVE) -->
                                 <div class="col-lg-6 col-md-6">
-									<i class="fa fa-flag"></i>
-                                    <span class="text-primary">Status: </span><span :class="{ 'text-primary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }">{{ connectionText }}</span>
+                                    <i :class="statusIconClass" style="margin-right: 4px;"></i>
+                                    <span class="text-primary">Status: </span>
+                                    <span :class="statusTextClass">{{ connectionText }}</span>
                                     <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                 </div>
                                 <!-- WAN Info Section (HTML + JS) -->
                                 <div class="col-lg-6 col-md-6">
-									<i class="fa fa-server"></i>
+                                    <i class="fa fa-server"></i>
                                     <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
                                 </div>
                                 <!-- Ping Section -->
@@ -143,12 +149,12 @@
                                     </i>
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
-								<div class="col-lg-6 col-md-6 pb-lg-1">
-								    <i class="fa fa-flag-o"></i>
+                                <div class="col-lg-6 col-md-6 pb-lg-1">
+                                    <i class="fa fa-flag"></i>
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
                                 </div>
                                 <!-- End WAN Info Section -->
-				<div class="col-12 mb-2">
+                                <div class="col-12 mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
                                         <i class="fa fa-refresh"></i> Refresh Info
                                     </button>
@@ -256,6 +262,88 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
     setInterval(updatePing, 5000);     // Refresh ping every 5 seconds
+});
+</script>
+
+<!-- Vue instance -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        config: {
+            mode: 0,
+            profile: '',
+            temp: { modes: [] },
+            profiles: [],
+            system: {
+                tun2socks: { legacy: false },
+                tunnel: { autostart: false, dns_resolver: false, ping_loop: false },
+                system: { memory_cleaner: false }
+            }
+        },
+        status: false,
+        statusText: 'Start',
+        connection: 0, // 0=Disconnected, 1=Connecting, 2=Connected, 3=Info
+        connectionText: 'Disconnected',
+        connectedTime: '',
+        log: '',
+    },
+    computed: {
+        sortedModes() {
+            // You can sort modes here if needed
+            return this.config.temp.modes;
+        },
+        statusIconClass() {
+            switch (this.connection) {
+                case 0: return 'fa fa-circle text-primary';
+                case 1: return 'fa fa-exclamation-circle text-warning';
+                case 2: return 'fa fa-check-circle text-success';
+                case 3: return 'fa fa-info-circle text-info';
+                default: return 'fa fa-circle text-secondary';
+            }
+        },
+        statusTextClass() {
+            switch (this.connection) {
+                case 0: return 'text-primary';
+                case 1: return 'text-warning';
+                case 2: return 'text-success';
+                case 3: return 'text-info';
+                default: return 'text-secondary';
+            }
+        }
+    },
+    methods: {
+        runLibernet() {
+            // Your logic to start/stop Libernet
+            // Update status, connection, connectionText, connectedTime as needed
+            // Example:
+            this.status = !this.status;
+            if (this.status) {
+                this.connection = 1;
+                this.connectionText = 'Connecting';
+                setTimeout(() => {
+                    this.connection = 2;
+                    this.connectionText = 'Connected';
+                    this.connectedTime = new Date().toLocaleTimeString();
+                }, 2000);
+            } else {
+                this.connection = 0;
+                this.connectionText = 'Disconnected';
+                this.connectedTime = '';
+            }
+        }
+    },
+    mounted() {
+        // Example: set up initial modes and profiles
+        this.config.temp.modes = [
+            { value: 0, name: 'Mode 0' },
+            { value: 1, name: 'Mode 1' },
+            { value: 2, name: 'Mode 2' }
+        ];
+        this.config.profiles = ['Default', 'Profile 1', 'Profile 2'];
+        this.config.profile = this.config.profiles[0];
+    }
 });
 </script>
 </body>
