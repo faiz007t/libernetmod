@@ -66,7 +66,7 @@ mkdir -p "$LUCI_THEME_DIR/htdocs"
 wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
 ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
 
-# Create theme CSS with improved result box styling and white navbar toggler icon
+# Create default theme CSS with improved result box styling and white navbar toggler icon
 mkdir -p "$LUCI_THEME_DIR/static/styles"
 cat > "$LUCI_THEME_DIR/static/styles/libernet.css" <<EOF
 body {
@@ -104,17 +104,64 @@ pre[ref="log"] {
 }
 EOF
 
+# Create a NEW custom theme CSS
+cat > /www/libernet/custom-theme.css <<EOF
+body {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%) !important;
+    color: #e0e0e0 !important;
+}
+.panel-default, .panel {
+    background: rgba(30,30,34,0.95) !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+.result-box,
+#result,
+pre.result-box,
+pre#result,
+pre.form-control,
+pre[ref="log"] {
+    background: #222 !important;
+    color: #00ffcc !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 20px rgba(0,255,204,0.10) !important;
+    padding: 18px !important;
+    margin: 18px 0 !important;
+    font-family: 'Fira Mono', 'Consolas', monospace !important;
+}
+.navbar {
+    background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%) !important;
+    color: #fff !important;
+    border: none !important;
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.navbar-toggler {
+    border-color: #00ffcc !important;
+}
+a, a:visited {
+    color: #00ffcc !important;
+}
+a:hover {
+    color: #fff !important;
+    text-decoration: underline;
+}
+EOF
+
 # Link theme resources with proper symlink handling
 ln -sfn "$LUCI_THEME_DIR/static" "/www/static/$THEME_NAME"
 
-# Make sure head.php always sets the background for all pages
-cat > /www/libernet/head.php <<EOF
+# Make sure head.php always sets the background for all pages and allows theme switching
+cat > /www/libernet/head.php <<'EOF'
 <?php
 echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
+# To switch themes, change the href below:
+echo '<link rel="stylesheet" href="/libernet/custom-theme.css">';
+# echo '<link rel="stylesheet" href="/static/libernet-mod/styles/libernet.css">';
 echo '<style>
 body {
-    background: url("$BG_URL") no-repeat center center fixed !important;
-    background-size: cover !important;
+    min-height: 100vh !important;
 }
 </style>';
 ?>
