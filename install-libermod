@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 # ---------------------------
@@ -21,6 +20,9 @@ check_dep() {
 check_dep unzip
 check_dep wget
 
+# ---------------------------
+# Download & Extract Libernet Mod
+# ---------------------------
 echo -e "Downloading file..."
 {
     wget -O /www/libernet.zip --no-check-certificate https://github.com/hanifwidi17/libermod/raw/main/libernet.zip
@@ -33,6 +35,9 @@ echo -e "Extracting file..."
 } &> log-extract.txt
 sleep 2
 
+# ---------------------------
+# Mod & Change Theme Color
+# ---------------------------
 echo -e "Mod & Change Theme Color..."
 {
     wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
@@ -48,13 +53,16 @@ echo -e "Mod & Change Theme Color..."
     wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
 
+# ---------------------------
 # THEME & FAVICON IMPROVEMENTS
+# ---------------------------
 echo -e "Improving theme and favicon settings..."
 
-FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
-BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
 THEME_NAME="libernet-mod"
-LUCI_THEME_DIR="/usr/lib/lua/luci/view/themes/$THEME_NAME"
+ICON_COLOR="#00bcd4"
+BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
+LUCI_THEME_DIR="/www/static/$THEME_NAME"
 LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
 LUCI_VIEW="/usr/lib/lua/luci/view/libernet-view.htm"
 
@@ -65,6 +73,81 @@ mkdir -p /www/static
 mkdir -p "$LUCI_THEME_DIR/htdocs"
 wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
 ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
+
+# Create theme CSS
+mkdir -p "$LUCI_THEME_DIR/styles"
+cat > "$LUCI_THEME_DIR/styles/libernet.css" <<EOF
+body {
+    background: url('$BG_URL') no-repeat center center fixed;
+    background-size: cover;
+}
+.panel-default, .panel {
+    background: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(5px);
+}
+.result-box,
+#result,
+pre.result-box,
+pre#result,
+pre.form-control,
+pre[ref="log"] {
+    background: #fff !important;
+    color: #000 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08) !important;
+    padding: 16px !important;
+    margin: 16px 0 !important;
+}
+.navbar {
+    background: rgba(0,31,63,0.9) !important;
+    backdrop-filter: blur(5px);
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.navbar-toggler {
+    border-color: #fff;
+}
+.icon-cyan, .icon-cyan i, .icon-cyan .fa, .icon-cyan .fas, .icon-cyan .far, .icon-cyan .fab, .icon-cyan .fa-solid, .icon-cyan .fa-regular, .icon-cyan .fa-brands, .icon-cyan span.emoji {
+    color: $ICON_COLOR !important;
+}
+EOF
+
+# Link theme resources
+ln -sfn "$LUCI_THEME_DIR" "/www/static/$THEME_NAME"
+
+# Update head.php for custom favicon and CSS
+cat > /www/libernet/head.php <<EOF
+<?php
+echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
+echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">';
+echo '<link rel="stylesheet" href="/static/libernet-mod/styles/libernet.css">';
+echo '<style>
+body { min-height: 100vh !important; }
+</style>';
+?>
+EOF
+
+# ---------------------------
+# LuCI Integration
+# ---------------------------
+mkdir -p /usr/lib/lua/luci/controller
+cat > "$LUCI_CONTROLLER" <<EOF
+module("luci.controller.libernet", package.seeall)
+function index()
+    entry({"admin", "services", "libernet"}, template("libernet-view"), _("Libernet"), 60)
+end
+EOF
+
+mkdir -p /usr/lib/lua/luci/view
+cat > "$LUCI_VIEW" <<EOF
+<%+header%>
+<div class="cbi-map">
+    <h2 class="text-center"><%:Libernet Mod Interface%></h2>
+    <iframe src="/libernet" style="width:100%; height:80vh; border:none; background:transparent;"></iframe>
+</div>
+<%+footer%>
+EOF
 
 # ---------------------------
 # Final Configuration
