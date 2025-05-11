@@ -144,7 +144,7 @@
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
 								<div class="col-lg-6 col-md-6 pb-lg-1">
-								    <i class="fa fa-flag-o"></i>
+								    <i class="fa fa-globe"></i>
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
                                 </div>
                                 <!-- End WAN Info Section -->
