@@ -6,12 +6,12 @@
 <li> Add Background Music</li>
 
 # Cara Install
-<li> Pastikan dah install libernet</li>
+<li> First install Libernet</li>
 <br>
-<a href="https://github.com/lutfailham96/libernet">Libernet by Lutfa Ilham</a>
+opkg update && wget -O install.sh https://raw.githubusercontent.com/faiz007t/libernetmod/main/install.sh -q && sed -i 's/\r$//' install.sh && bash install.sh
 </br>
 </br>
-<li> Run script di terminal:</li>
+<li> Second install Libernet Mod</li>
 <br>
 opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernet/main/install-libermod -q && sed -i 's/\r$//' install-libermod && bash install-libermod
 </br>
