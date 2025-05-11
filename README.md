@@ -5,6 +5,12 @@
 <li> Change Background Image</li>
 <li> Add Background Music</li>
 
+## Installation
+- If you don't have bash & curl on OpenWRT install first:
+```sh
+opkg update && opkg install bash curl;bash -c "$(curl -sko - 'https://raw.githubusercontent.com/lutfailham96/libernet/main/install.sh')"
+```
+
 # Cara Install
 <li> First install Libernet</li>
 <br>
