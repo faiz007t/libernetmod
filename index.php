@@ -88,47 +88,7 @@
                             </div>
                         </form>
                             <div class="row">
-                                <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy" >
-                                        <label class="form-check-label" for="tun2socks-legacy">
-                                            Use tun2socks legacy
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
-                                        <label class="form-check-label" for="autostart">
-                                            Auto start Libernet on boot
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status === true" id="dns-resolver">
-                                        <label class="form-check-label" for="dns-resolver">
-                                            DNS resolver
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.system.memory_cleaner" :disabled="status === true" id="memory-cleaner">
-                                        <label class="form-check-label" for="memory-cleaner">
-                                            Memory cleaner
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.ping_loop" :disabled="status === true" id="ping-loop">
-                                        <label class="form-check-label" for="ping-loop">
-                                            PING loop
-                                        </label>
-                                    </div>
-                                </div>
-                                <!-- Status with dynamic icon -->
+                                <!-- Status: Always first -->
                                 <div class="col-lg-6 col-md-6">
                                     <i :class="{
                                         'fa fa-circle text-muted': connection === 0,
@@ -145,18 +105,19 @@
                                     }">{{ connectionText }}</span>
                                     <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                 </div>
-                                <!-- WAN Info Section (HTML + JS) -->
-                                <div class="col-lg-6 col-md-6">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
-                                </div>
-                                <!-- Ping Section -->
+                                <!-- Ping: Always second -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
                                     <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
                                         <span class="ping-heartbeat" id="ping-heartbeat"></span>
                                     </i>
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                 </div>
+                                <!-- IP: Always third -->
+                                <div class="col-lg-6 col-md-6">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
+                                </div>
+                                <!-- ISP: Always fourth -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1">
                                     <i class="fa fa-server"></i>
                                     <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
