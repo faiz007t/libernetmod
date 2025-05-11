@@ -1,56 +1,154 @@
-<?php
-    $url_array = explode('/', $_SERVER['REQUEST_URI']);
-    $url = end($url_array);
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Libernet Mod</title>
-    <!-- Bootstrap CSS (v4.6 or v5 recommended) -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Font Awesome for icons (optional) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-    .navbar-toggler {
-        border-color: rgba(255,255,255,0.5);
-    }
-    .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255,255,255,1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-    }
-    </style>
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #11195b;">
-    <a class="navbar-brand" href="#"></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-            <li class="nav-item <?php if ($url === 'index.php') echo 'active'; ?>">
-                <a class="nav-link text-white" href="index.php">
-                    <i class="fa fa-home"></i> Home
-                    <?php if ($url === 'index.php') echo '<span class="sr-only">(current)</span>'; ?>
-                </a>
-            </li>
-            <li class="nav-item <?php if ($url === 'config.php') echo 'active'; ?>">
-                <a class="nav-link text-white" href="config.php">
-                    <i class="fa fa-gear"></i> Configuration
-                </a>
-            </li>
-            <li class="nav-item <?php if ($url === 'about.php') echo 'active'; ?>">
-                <a class="nav-link text-white" href="about.php">
-                    <i class="fa fa-info"></i> About
-                </a>
-            </li>
-        </ul>
-    </div>
-</nav>
+#!/bin/bash
 
-<!-- Bootstrap JS, Popper.js, and jQuery (for Bootstrap 4) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+set -e
+
+# ---------------------------
+# Initialization
+# ---------------------------
+clear
+echo -e "##############################################"
+echo -e "#        Libernet Mod v1.5.4 Installer Pro   #"
+echo -e "##############################################\n"
+echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
+sleep 2
+
+# ---------------------------
+# Dependency Check
+# ---------------------------
+check_dep() {
+    command -v "$1" >/dev/null 2>&1 || { opkg update && opkg install "$1"; }
+}
+check_dep unzip
+check_dep wget
+
+echo -e "Downloading file..."
+{
+    wget -O /www/libernet.zip --no-check-certificate https://github.com/hanifwidi17/libermod/raw/main/libernet.zip
+    rm -rf /www/libernet
+} &> log-download.txt
+
+echo -e "Extracting file..."
+{
+    unzip /www/libernet.zip -d /www
+} &> log-extract.txt
+sleep 2
+
+echo -e "Add Background Music..."
+{
+    mkdir -p /www/libernet/music
+    wget -O /www/libernet/music/music.mp3 --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/music.mp3
+} &> log-install.txt
+sleep 2
+
+echo -e "Mod & Change Theme Color..."
+{
+    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
+    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
+    wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/index.php
+    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
+    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
+    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
+    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
+    wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg
+    wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg
+    wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/bootstrap.min.css
+    wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/ping-loop.sh
+} &> log-install.txt
+
+# THEME & FAVICON IMPROVEMENTS
+echo -e "Improving theme and favicon settings..."
+
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
+BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
+THEME_NAME="libernet-mod"
+LUCI_THEME_DIR="/usr/lib/lua/luci/view/themes/$THEME_NAME"
+LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
+LUCI_VIEW="/usr/lib/lua/luci/view/libernet-view.htm"
+
+# Ensure /www/static exists before symlinking
+mkdir -p /www/static
+
+# Download and install favicon for all pages
+mkdir -p "$LUCI_THEME_DIR/htdocs"
+wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
+ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
+
+# Create theme CSS with white navbar toggler icon
+mkdir -p "$LUCI_THEME_DIR/static/styles"
+cat > "$LUCI_THEME_DIR/static/styles/libernet.css" <<EOF
+body {
+    background: url('$BG_URL') no-repeat center center fixed;
+    background-size: cover;
+}
+.panel-default, .panel {
+    background: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(5px);
+}
+.result-box {
+    background: rgba(255,255,255,0.95) !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+.navbar {
+    background: rgba(0,31,63,0.9) !important;
+    backdrop-filter: blur(5px);
+}
+/* Make Bootstrap navbar toggler icon (hamburger) white */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.navbar-toggler {
+    border-color: #fff;
+}
+EOF
+
+# Link theme resources with proper symlink handling
+ln -sfn "$LUCI_THEME_DIR/static" "/www/static/$THEME_NAME"
+
+# LuCI controller and view for menu integration
+mkdir -p /usr/lib/lua/luci/controller
+cat > "$LUCI_CONTROLLER" <<EOF
+module("luci.controller.libernet", package.seeall)
+function index()
+    entry({"admin", "services", "libernet"}, template("libernet-view"), _("Libernet"), 60)
+end
+EOF
+
+mkdir -p /usr/lib/lua/luci/view
+cat > "$LUCI_VIEW" <<EOF
+<%+header%>
+<div class="cbi-map">
+    <h2 class="text-center"><%:Libernet Mod Interface%></h2>
+    <iframe src="/libernet" style="width:100%; height:80vh; border:none; background:transparent;"></iframe>
+</div>
+<%+footer%>
+EOF
+
+# ---------------------------
+# Final Configuration
+# ---------------------------
+echo -e "\nSetting file permissions..."
+chmod 644 "$LUCI_CONTROLLER"
+chmod 644 "$LUCI_VIEW"
+
+echo -e "\nRestarting web service..."
+/etc/init.d/uhttpd restart
+
+# ---------------------------
+# Cleanup
+# ---------------------------
+echo -e "\nCleaning up installation files..."
+rm -f /www/libernet.zip
+rm -f "$0"
+
+# ---------------------------
+# Completion Message
+# ---------------------------
+echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
+echo -e "Access Libernet Mod via:"
+echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "2. LuCI Interface: Services Menu -> Libernet"
+echo -e "\nDon't forget to:"
+echo -e "- Clear your browser cache"
+echo -e "- Check installation log at: install.log"
+echo -e "- Backup important configurations\n"
