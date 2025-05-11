@@ -59,7 +59,7 @@ echo -e "Mod & Change Theme Color..."
 echo -e "Improving theme and favicon settings..."
 
 THEME_NAME="libernet-mod"
-ICON_COLOR="#00bcd4"
+ICON_COLOR="#00bcd4" # Cyan (change this to any color you want)
 BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
 FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
 LUCI_THEME_DIR="/www/static/$THEME_NAME"
@@ -74,9 +74,9 @@ mkdir -p "$LUCI_THEME_DIR/htdocs"
 wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
 ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
 
-# Create theme CSS
-mkdir -p "$LUCI_THEME_DIR/styles"
-cat > "$LUCI_THEME_DIR/styles/libernet.css" <<EOF
+# Create theme CSS with improved result box styling, white navbar toggler, and unified icon color
+mkdir -p "$LUCI_THEME_DIR/static/styles"
+cat > "$LUCI_THEME_DIR/static/styles/libernet.css" <<EOF
 body {
     background: url('$BG_URL') no-repeat center center fixed;
     background-size: cover;
@@ -85,6 +85,7 @@ body {
     background: rgba(255,255,255,0.9) !important;
     backdrop-filter: blur(5px);
 }
+/* Result/Log box: support all common selectors */
 .result-box,
 #result,
 pre.result-box,
@@ -102,21 +103,23 @@ pre[ref="log"] {
     background: rgba(0,31,63,0.9) !important;
     backdrop-filter: blur(5px);
 }
+/* Make Bootstrap navbar toggler icon (hamburger) white */
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 .navbar-toggler {
     border-color: #fff;
 }
+/* Unified icon color for Font Awesome and emoji */
 .icon-cyan, .icon-cyan i, .icon-cyan .fa, .icon-cyan .fas, .icon-cyan .far, .icon-cyan .fab, .icon-cyan .fa-solid, .icon-cyan .fa-regular, .icon-cyan .fa-brands, .icon-cyan span.emoji {
     color: $ICON_COLOR !important;
 }
 EOF
 
-# Link theme resources
-ln -sfn "$LUCI_THEME_DIR" "/www/static/$THEME_NAME"
+# Link theme resources with proper symlink handling
+ln -sfn "$LUCI_THEME_DIR/static" "/www/static/$THEME_NAME"
 
-# Update head.php for custom favicon and CSS
+# Make sure head.php always sets the background for all pages, loads Font Awesome, and uses the icon-cyan class
 cat > /www/libernet/head.php <<EOF
 <?php
 echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
@@ -128,9 +131,7 @@ body { min-height: 100vh !important; }
 ?>
 EOF
 
-# ---------------------------
-# LuCI Integration
-# ---------------------------
+# LuCI controller and view for menu integration
 mkdir -p /usr/lib/lua/luci/controller
 cat > "$LUCI_CONTROLLER" <<EOF
 module("luci.controller.libernet", package.seeall)
