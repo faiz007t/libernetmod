@@ -1,103 +1,201 @@
 #!/bin/bash
+# Libernet Mod Installer with LuCI Integration
+# Combined script with enhanced error handling and styling
 
-# Libermod Installer by Hanif Widi Widodo - Improved Version
+set -e
 
-clear
-echo "#############################################"
-echo "#  Libermod Installer by Hanif Widi Widodo  #"
-echo "#############################################"
-echo
-sleep 1
-echo "* Sebelum install libermod pastikan sudah terinstall libernet sebelumnya *"
-echo
-sleep 1
-echo "- REMOVE LOGIN PAGE"
-echo "- REMOVE SPEEDTEST PAGE"
-echo "- CHANGE THEME COLOR"
-echo "- CHANGE BACKGROUND IMAGE"
-echo "- ADD BACKGROUND MUSIC"
-echo "- FIX BENGONG (InshaAllah Aman)"
-echo
-sleep 2
+# ---------------------------
+# Configuration Variables
+# ---------------------------
+LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
+LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
+LIBERNET_DIR="/www/libernet"
+BACKUP_DIR="/www/libernet_backup_$(date +%s)"
+GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
 
-# Check for required commands
-for cmd in opkg wget unzip; do
-    if ! command -v $cmd &>/dev/null; then
-        echo "ERROR: Command '$cmd' not found! Please install it first."
-        exit 1
-    fi
-done
-
-echo "Harap tunggu, libermod segera di install..."
-sleep 1
-echo "#"
-sleep 1
-echo "##"
-sleep 1
-echo "###"
-sleep 1
-
-echo "Downloading file..."
-{
-    opkg install unzip
-    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Failed to download libernet.zip"
-        exit 1
-    fi
-    rm -rf /www/libernet
-} &> log-download.txt
-
-echo "Extracting file..."
-{
-    unzip -o /www/libernet.zip -d /www
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Failed to unzip libernet.zip"
-        exit 1
-    fi
-} &> log-extract.txt
-sleep 2
-
-echo "Mod & Change Theme Color..."
-{
-    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
-    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
-    wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
-    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
-    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
-    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
-    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
-    wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-    wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-    wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
-    wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
-} &> log-install.txt
-
-# Set proper permissions
-chmod -R 755 /www/libernet
-
-# Clean up
-rm -f /www/libernet.zip
-rm -f install-libermod
-
-# PHP error reporting for debugging (optional)
-php_error_file="/www/libernet/index.php"
-if grep -q "<?php" "$php_error_file"; then
-    sed -i '1i\
-<?php\
-ini_set("display_errors", 1);\
-ini_set("display_startup_errors", 1);\
-error_reporting(E_ALL);\
-?>' "$php_error_file"
+# ---------------------------
+# Root Check
+# ---------------------------
+if [[ "$EUID" -ne 0 ]]; then
+   echo "ERROR: Script must be run as root!" 
+   exit 1
 fi
 
-echo
-echo "PROSES PEMASANGAN LIBERMOD SELESAI!"
-echo "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
-echo
-echo "Jika halaman tetap blank, cek file log-download.txt, log-extract.txt, dan log-install.txt untuk error."
-echo "Juga cek isi file /www/libernet/index.php, pastikan tidak kosong dan tidak ada error."
-echo "Jika perlu, restart web server atau perangkat Anda."
-echo
+# ---------------------------
+# Initialization
+# ---------------------------
+clear
+echo -e "##############################################"
+echo -e "#        Libernet Mod v1.5.4 Installer Pro   #"
+echo -e "##############################################\n"
+echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
+sleep 2
 
-exit 0
+# ---------------------------
+# Dependency Check
+# ---------------------------
+check_dependency() {
+    if ! command -v $1 &> /dev/null; then
+        echo "Installing dependency: $1..."
+        opkg update && opkg install $1
+    fi
+}
+
+check_dependency unzip
+check_dependency wget
+
+# ---------------------------
+# Backup Existing Installation
+# ---------------------------
+if [ -d "$LIBERNET_DIR" ]; then
+    echo -e "\nCreating backup of previous installation..."
+    cp -r "$LIBERNET_DIR" "$BACKUP_DIR"
+    echo -e "Backup saved at: $BACKUP_DIR\n"
+fi
+
+# ---------------------------
+# Main Installation
+# ---------------------------
+echo -e "\nStarting Libernet Mod installation process..."
+{
+    echo -e "\nDownloading main package..."
+    wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
+    
+    echo -e "\nExtracting files..."
+    unzip -o "/www/libernet.zip" -d "/www"
+    
+    echo -e "\nInstalling modified files:"
+    declare -A MOD_FILES=(
+        ["system.php"]="system.php"
+        ["navbar.php"]="navbar.php" 
+        ["index.php"]="index.php"
+        ["head.php"]="head.php"
+        ["footer.php"]="footer.php"
+        ["config.php"]="config.php"
+        ["about.php"]="about.php"
+        ["bootstrap.min.css"]="bootstrap.min.css"
+        ["ping-loop.sh"]="ping-loop.sh"
+    )
+
+    for file in "${!MOD_FILES[@]}"; do
+        echo " - ${MOD_FILES[$file]}"
+        wget -O "${LIBERNET_DIR}/${MOD_FILES[$file]}" --no-check-certificate "${GITHUB_BASE}/${file}"
+    done
+
+    echo -e "\nSetting file permissions..."
+    chmod +x "/root/libernet/bin/ping-loop.sh"
+} 2>&1 | tee install.log
+
+# ---------------------------
+# LuCI Integration
+# ---------------------------
+echo -e "\nCreating LuCI integration..."
+cat > $LUCI_CONTROLLER <<'EOF'
+module("luci.controller.libernet", package.seeall)
+
+function index()
+    entry({"admin", "services", "libernet"}, template("libernet"), _("Libernet"), 55).leaf = true
+end
+EOF
+
+cat > $LUCI_VIEW <<'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Libernet Mod | Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #222;
+      touch-action: manipulation;
+    }
+    #libernet {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+    #luci-back {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      border-radius: 50%;
+      padding: 8px;
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      transition: all 0.2s;
+      touch-action: manipulation;
+    }
+    #luci-back svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+    @media (max-width: 768px) {
+      #luci-back {
+        width: 44px;
+        height: 44px;
+        top: 8px;
+        left: 8px;
+      }
+      #luci-back svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button id="luci-back"
+          role="button"
+          aria-label="Return to LuCI interface"
+          onclick="window.location.href='http://' + window.location.hostname + '/cgi-bin/luci/'">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+  </button>
+
+  <iframe id="libernet" scrolling="auto"></iframe>
+
+  <script>
+    document.getElementById("libernet").src = "http://" + window.location.hostname + "/libernet";
+  </script>
+</body>
+</html>
+EOF
+
+# ---------------------------
+# Final Configuration
+# ---------------------------
+echo -e "\nSetting file permissions..."
+chmod 644 $LUCI_CONTROLLER
+chmod 644 $LUCI_VIEW
+
+echo -e "\nRestarting web service..."
+/etc/init.d/uhttpd restart
+
+# ---------------------------
+# Cleanup
+# ---------------------------
+echo -e "\nCleaning up installation files..."
+rm -f "/www/libernet.zip"
+rm -f "$0"
+
+# ---------------------------
+# Completion Message
+# ---------------------------
+echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
+echo -e "Access Libernet Mod via:"
+echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "2. LuCI Interface: Services Menu -> Libernet"
+echo -e "\nDon't forget to:"
+echo -e "- Clear your browser cache"
+echo -e "- Check installation log at: install.log"
+echo -e "- Backup important configurations\n"
