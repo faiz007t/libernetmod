@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons)
+# Libermod Installer by Hanif Widi Widodo + Advanced LuCI Integration
 
 set -e
 
@@ -10,25 +10,37 @@ LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
 LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
 LIBERNET_DIR="/www/libernet"
 BACKUP_DIR="/www/libernet_backup_$(date +%s)"
-GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
-REMOTE_BG="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/re.jpg"
+GITHUB_BASE="https://raw.githubusercontent.com/hanifwidi17/libermod/main"
+REMOTE_BG="https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg"
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/icon.ico"
+MUSIC_URL="https://raw.githubusercontent.com/hanifwidi17/libermod/main/music.mp3"
 
 # ---------------------------
-# Root Check
-# ---------------------------
-if [[ "$EUID" -ne 0 ]]; then
-   echo -e "\033[1;31mERROR: Script must be run as root!\033[0m" 
-   exit 1
-fi
-
-# ---------------------------
-# Initialization
+# Welcome & Info
 # ---------------------------
 clear
-echo -e "\033[1;36m##############################################\033[0m"
-echo -e "\033[1;36m#        Libernet Mod v1.5.4 Installer Pro   #\033[0m"
-echo -e "\033[1;36m##############################################\033[0m\n"
-echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
+echo -e "#############################################"
+echo -e "#  Libermod Installer by Hanif Widi Widodo  #"
+echo -e "#############################################"
+echo -e ""
+sleep 1
+echo -e "*Sebelum install libermod pastikan sudah terinstall libernet sebelumnya*"
+echo -e ""
+sleep 1
+echo -e "- REMOVE LOGIN PAGE"
+echo -e "- REMOVE SPEEDTEST PAGE"
+echo -e "- CHANGE THEME COLOR"
+echo -e "- CHANGE BACKGROUND IMAGE"
+echo -e "- ADD BACKGROUND MUSIC"
+echo -e "- FIX BENGONG (InshaAllah Aman)"
+echo -e ""
+sleep 3
+echo -e "Harap tunggu, libermod segera di install..."
+echo -e "#"
+sleep 1
+echo -e "##"
+sleep 1
+echo -e "###"
 sleep 2
 
 # ---------------------------
@@ -40,12 +52,11 @@ check_dependency() {
         opkg update && opkg install $1
     fi
 }
-
 check_dependency unzip
 check_dependency wget
 
 # ---------------------------
-# Backup Existing Installation
+# Backup Existing Installation (as Directory)
 # ---------------------------
 if [ -d "$LIBERNET_DIR" ]; then
     echo -e "\n\033[1;33mCreating backup of previous installation...\033[0m"
@@ -54,46 +65,46 @@ if [ -d "$LIBERNET_DIR" ]; then
 fi
 
 # ---------------------------
-# Main Installation
+# Download and Extract Main Package
 # ---------------------------
-echo -e "\n\033[1;34mStarting Libernet Mod installation process...\033[0m"
-{
-    echo -e "\nDownloading main package..."
-    wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
-    
-    echo -e "\nExtracting files..."
-    unzip -o "/www/libernet.zip" -d "/www"
-    
-    echo -e "\nInstalling modified files:"
-    declare -A MOD_FILES=(
-        ["system.php"]="system.php"
-        ["navbar.php"]="navbar.php" 
-        ["index.php"]="index.php"
-        ["head.php"]="head.php"
-        ["footer.php"]="footer.php"
-        ["config.php"]="config.php"
-        ["about.php"]="about.php"
-        ["ping-loop.sh"]="ping-loop.sh"
-    )
+echo -e "Downloading file..."
+opkg install unzip
+wget -O /www/libernet.zip --no-check-certificate "$GITHUB_BASE/libernet.zip"
+rm -rf /www/libernet
+echo -e "Extracting file..."
+unzip /www/libernet.zip -d /www
 
-    for file in "${!MOD_FILES[@]}"; do
-        echo " - ${MOD_FILES[$file]}"
-        wget -O "${LIBERNET_DIR}/${MOD_FILES[$file]}" --no-check-certificate "${GITHUB_BASE}/${file}"
-    done
+# ---------------------------
+# Add Background Music
+# ---------------------------
+echo -e "Adding Background Music..."
+mkdir -p /www/libernet/music
+wget -O /www/libernet/music/music.mp3 --no-check-certificate "$MUSIC_URL"
 
-    echo -e "\nSetting file permissions..."
-    chmod +x "/root/libernet/bin/ping-loop.sh"
-} 2>&1 | tee install.log
+# ---------------------------
+# Mod & Change Theme Color, Background, System Files
+# ---------------------------
+echo -e "Mod & Change Theme Color..."
+wget -O /www/libernet/system.php --no-check-certificate "$GITHUB_BASE/system.php"
+wget -O /www/libernet/navbar.php --no-check-certificate "$GITHUB_BASE/navbar.php"
+wget -O /www/libernet/index.php --no-check-certificate "$GITHUB_BASE/index.php"
+wget -O /www/libernet/head.php --no-check-certificate "$GITHUB_BASE/head.php"
+wget -O /www/libernet/footer.php --no-check-certificate "$GITHUB_BASE/footer.php"
+wget -O /www/libernet/config.php --no-check-certificate "$GITHUB_BASE/config.php"
+wget -O /www/libernet/about.php --no-check-certificate "$GITHUB_BASE/about.php"
+wget -O /www/libernet/img/re.jpg --no-check-certificate "$GITHUB_BASE/re.jpg"
+wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate "$GITHUB_BASE/re.jpg"
+wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate "$GITHUB_BASE/bootstrap.min.css"
+wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate "$GITHUB_BASE/ping-loop.sh"
+
+# ---------------------------
+# Download favicon for all LuCI and browser pages
+# ---------------------------
+wget -O /www/favicon.ico "$FAVICON_URL"
 
 # ---------------------------
 # Custom Theme: CSS and head.php
 # ---------------------------
-echo -e "\n\033[1;34mApplying custom theme...\033[0m"
-
-# Create libernet directory if missing
-mkdir -p "$LIBERNET_DIR"
-
-# Write custom bootstrap.min.css
 cat > "${LIBERNET_DIR}/bootstrap.min.css" <<EOF
 body, .container, .container-fluid {
   background: transparent !important;
@@ -128,7 +139,7 @@ body, .container, .container-fluid {
 .icon-bar {
   background-color: #fff !important;
 }
-/* Make back icon in navbar white */
+/* Make back icon in navbar white (if any) */
 .navbar .back-icon svg,
 .navbar .navbar-back svg,
 .navbar .navbar-back-icon svg {
@@ -145,9 +156,12 @@ html {
 }
 EOF
 
-# Write custom head.php
 cat > "${LIBERNET_DIR}/head.php" <<EOF
 <?php
+echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
+echo '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">';
+echo '<link rel="icon" type="image/x-icon" href="$FAVICON_URL">';
+echo '<link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">';
 echo '<style>
   html, body, .container, .container-fluid {
     background: transparent !important;
@@ -186,7 +200,7 @@ echo '<style>
   .icon-bar {
     background-color: #fff !important;
   }
-  /* Make back icon in navbar white */
+  /* Make back icon in navbar white (if any) */
   .navbar .back-icon svg,
   .navbar .navbar-back svg,
   .navbar .navbar-back-icon svg {
@@ -206,7 +220,6 @@ EOF
 # ---------------------------
 echo -e "\n\033[1;34mCreating LuCI integration...\033[0m"
 
-# Ensure directories exist
 mkdir -p "$(dirname "$LUCI_CONTROLLER")"
 mkdir -p "$(dirname "$LUCI_VIEW")"
 
@@ -224,6 +237,10 @@ cat > "$LUCI_VIEW" <<EOF
 <head>
   <title>Libernet Mod | Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="$FAVICON_URL">
+  <link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">
   <style>
     html, body {
       height: 100%;
@@ -261,6 +278,8 @@ cat > "$LUCI_VIEW" <<EOF
       width: 28px;
       height: 28px;
       fill: #fff !important;
+      color: #fff !important;
+      /* This ensures the back icon is always white */
     }
     @media (max-width: 768px) {
       #luci-back {
@@ -292,7 +311,7 @@ cat > "$LUCI_VIEW" <<EOF
     .icon-bar {
       background-color: #fff !important;
     }
-    /* Make back icon in navbar white */
+    /* Make back icon in navbar white (if any) */
     .navbar .back-icon svg,
     .navbar .navbar-back svg,
     .navbar .navbar-back-icon svg {
@@ -310,7 +329,7 @@ cat > "$LUCI_VIEW" <<EOF
           role="button"
           aria-label="Return to LuCI interface"
           onclick="window.location.href='http://' + window.location.hostname + '/cgi-bin/luci/'">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#fff">
       <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
     </svg>
   </button>
@@ -344,11 +363,11 @@ rm -f "$0"
 # ---------------------------
 # Completion Message
 # ---------------------------
-echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
+echo -e "\n\033[1;32mPROSES PEMASANGAN LIBERMOD SELESAI!\033[0m"
+echo -e "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
+echo -e ""
 echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[1;34mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "1. Web Interface: \033[1;34mhttp://\$(uci get network.lan.ipaddr)/libernet\033[0m"
 echo -e "2. LuCI Interface: Services Menu -> Libernet"
-echo -e "\nDon't forget to:"
-echo -e "- Clear your browser cache"
 echo -e "- Check installation log at: install.log"
 echo -e "- Backup important configurations\n"
