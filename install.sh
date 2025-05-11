@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Libernet Mod Installer
-# v1.5.4
+# Libernet Installer
+# by Lutfa Ilham
+# v1.0.0
 
 if [ "$(id -u)" != "0" ]; then
   echo "This script must be run as root" 1>&2
@@ -15,7 +16,7 @@ LIBERNET_WWW="/www/libernet"
 STATUS_LOG="${LIBERNET_DIR}/log/status.log"
 DOWNLOADS_DIR="${HOME}/Downloads"
 LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
-REPOSITORY_URL="https://github.com/faiz007t/libernetmod"
+REPOSITORY_URL="https://github.com/lutfailham96/libernet"
 
 function install_packages() {
   while IFS= read -r line; do
@@ -32,7 +33,7 @@ function install_proprietary_binaries() {
     if ! which ${line} > /dev/null 2>&1; then
       bin="/usr/bin/${line}"
       echo "Installing ${line} ..."
-      curl -sLko "${bin}" "https://github.com/faiz007t/libernet-proprietary/raw/main/${ARCH}/binaries/${line}"
+      curl -sLko "${bin}" "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/binaries/${line}"
       chmod +x "${bin}"
     fi
   done < binaries.txt
@@ -44,7 +45,7 @@ function install_proprietary_packages() {
     if ! which ${line} > /dev/null 2>&1; then
       pkg="/tmp/${line}.ipk"
       echo "Installing ${line} ..."
-      curl -sLko "${pkg}" "https://github.com/faiz007t/libernet-proprietary/raw/main/${ARCH}/packages/${line}.ipk"
+      curl -sLko "${pkg}" "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/packages/${line}.ipk"
       opkg install "${pkg}"
       rm -rf "${pkg}"
     fi

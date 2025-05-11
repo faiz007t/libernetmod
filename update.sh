@@ -1,25 +1,26 @@
 #!/bin/bash
 
-# Libernet Mod Updater
-# v1.5.4
+# Libernet Updater
+# by Lutfa Ilham
+# v1.0.0
 
 HOME="/root"
 DOWNLOADS_DIR="${HOME}/Downloads"
-LIBERNET_TMP="${DOWNLOADS_DIR}/libernetmod"
-REPOSITORY_URL="git://github.com/faiz007t/libernetmod.git"
+LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
+REPOSITORY_URL="git://github.com/lutfailham96/libernet.git"
 
 function update_libernet() {
   if [[ ! -d "${LIBERNET_TMP}" ]]; then
     echo -e "There's no Libernet installer on ~/Downloads directory, please clone it first!"
     exit 1
   fi
-  # change working dir to Libernet Mod installer
+  # change working dir to Libernet installer
   cd "${LIBERNET_TMP}"
-  # verify Libernet Mod installer
+  # verify Libernet installer
   if git branch > /dev/null 2>&1; then
     update_libernet_cli
   else
-    echo -e "This is not Libernet Mod installer directory, please use installer directory to update Libernet Mod !"
+    echo -e "This is not Libernet installer directory, please use installer directory to update Libernet!"
     exit 1
   fi
 }
