@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Custom Theme)
+# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme)
 
 set -e
 
@@ -236,6 +236,11 @@ cat > "$LUCI_VIEW" <<EOF
     }
     /* Ensure text inside boxes is black */
     .panel-default, .panel, .btn-default, .form-control {
+      color: #000 !important;
+    }
+    .navbar, .navbar-default {
+      background-color: #001f3f !important;
+      border-color: #001f3f !important;
       color: #000 !important;
     }
   </style>
