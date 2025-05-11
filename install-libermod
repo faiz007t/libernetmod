@@ -1,128 +1,114 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Theme Package Integration
 
 set -e
 
 # ---------------------------
-# Configuration Variables
+# Initialization
 # ---------------------------
-THEME_NAME="libernet-mod"
-LUCI_THEME_DIR="/usr/lib/lua/luci/view/themes/$THEME_NAME"
-LIBERNET_DIR="/www/libernet"
-FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
-BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
-
-# ---------------------------
-# Root Check
-# ---------------------------
-[ "$EUID" -ne 0 ] && { echo "ERROR: Script must be run as root!"; exit 1; }
+clear
+echo -e "##############################################"
+echo -e "#      Libernet Mod v1.5.4 Installer Pro     #"
+echo -e "##############################################\n"
+echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
+sleep 2
 
 # ---------------------------
 # Dependency Check
 # ---------------------------
 check_dep() {
-    command -v $1 >/dev/null 2>&1 || { opkg update; opkg install $1; }
+    command -v "$1" >/dev/null 2>&1 || { opkg update && opkg install "$1"; }
 }
 check_dep unzip
 check_dep wget
 
-# ---------------------------
-# Create LuCI Theme Structure
-# ---------------------------
-create_theme_package() {
-    echo -e "\nCreating LuCI theme package structure..."
-    
-    mkdir -p $LUCI_THEME_DIR/htdocs
-    cat > $LUCI_THEME_DIR/theme.lua <<EOF
-module("luci.theme.libernet-mod", package.seeall)
+echo -e "Downloading file..."
+{
+    wget -O /www/libernet.zip --no-check-certificate https://github.com/hanifwidi17/libermod/raw/main/libernet.zip
+    rm -rf /www/libernet
+} &> log-download.txt
 
-function get_path(...)
-    return require("luci.fs").joinpath(luci.util.libpath(), "view/themes/libernet-mod", ...)
-end
+echo -e "Extracting file..."
+{
+    unzip /www/libernet.zip -d /www
+} &> log-extract.txt
+sleep 2
 
-function get_image_path(...)
-    return get_path("htdocs", ...)
-end
+echo -e "Add Background Music..."
+{
+    mkdir -p /www/libernet/music
+    wget -O /www/libernet/music/music.mp3 --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/music.mp3
+} &> log-install.txt
+sleep 2
 
-function style(...)
-    return get_path("static/styles", ...)
-end
-EOF
+echo -e "Mod & Change Theme Color..."
+{
+    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
+    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
+    wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/index.php
+    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
+    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
+    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
+    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
+    wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg
+    wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/re.jpg
+    wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/bootstrap.min.css
+    wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/ping-loop.sh
+} &> log-install.txt
 
-    # Theme registration
-    mkdir -p /etc/uci-defaults
-    cat > /etc/uci-defaults/99-$THEME_NAME-theme <<EOF
-#!/bin/sh
-uci -q batch <<-EOT >/dev/null
-    set luci.themes.$THEME_NAME=/usr/lib/lua/luci/view/themes/$THEME_NAME
-    commit luci
-EOT
-rm -f \$0
-EOF
-    chmod 755 /etc/uci-defaults/99-$THEME_NAME-theme
-}
+# THEME & FAVICON IMPROVEMENTS
+echo -e "Improving theme and favicon settings..."
 
-# ---------------------------
-# Install Theme Assets
-# ---------------------------
-install_theme_assets() {
-    echo -e "\nInstalling theme assets..."
-    
-    # Create required directories
-    mkdir -p /www/static  # Fixes missing directory error
-    
-    # Download and install favicon
-    wget -O $LUCI_THEME_DIR/htdocs/favicon.ico $FAVICON_URL
-    ln -sf $LUCI_THEME_DIR/htdocs/favicon.ico /www/favicon.ico
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
+BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
+THEME_NAME="libernet-mod"
+LUCI_THEME_DIR="/usr/lib/lua/luci/view/themes/$THEME_NAME"
+LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
+LUCI_VIEW="/usr/lib/lua/luci/view/libernet-view.htm"
 
-    # Create theme CSS
-    mkdir -p $LUCI_THEME_DIR/static/styles
-    cat > $LUCI_THEME_DIR/static/styles/libernet.css <<EOF
+# Ensure /www/static exists before symlinking
+mkdir -p /www/static
+
+# Download and install favicon for all pages
+mkdir -p "$LUCI_THEME_DIR/htdocs"
+wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
+ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
+
+# Create theme CSS
+mkdir -p "$LUCI_THEME_DIR/static/styles"
+cat > "$LUCI_THEME_DIR/static/styles/libernet.css" <<EOF
 body {
     background: url('$BG_URL') no-repeat center center fixed;
     background-size: cover;
 }
-
 .panel-default, .panel {
     background: rgba(255,255,255,0.9) !important;
     backdrop-filter: blur(5px);
 }
-
 .result-box {
     background: rgba(255,255,255,0.95) !important;
     border-radius: 8px;
     box-shadow: 0 2px 15px rgba(0,0,0,0.1);
 }
-
 .navbar {
     background: rgba(0,31,63,0.9) !important;
     backdrop-filter: blur(5px);
 }
 EOF
 
-    # Link theme resources with proper symlink handling
-    ln -sfn $LUCI_THEME_DIR/static /www/static/$THEME_NAME
-}
+# Link theme resources with proper symlink handling
+ln -sfn "$LUCI_THEME_DIR/static" "/www/static/$THEME_NAME"
 
-# ---------------------------
-# LuCI Integration
-# ---------------------------
-luci_integration() {
-    echo -e "\nCreating LuCI integration..."
-    
-    # Controller
-    mkdir -p /usr/lib/lua/luci/controller
-    cat > /usr/lib/lua/luci/controller/libernet.lua <<EOF
+# LuCI controller and view for menu integration
+mkdir -p /usr/lib/lua/luci/controller
+cat > "$LUCI_CONTROLLER" <<EOF
 module("luci.controller.libernet", package.seeall)
-
 function index()
     entry({"admin", "services", "libernet"}, template("libernet-view"), _("Libernet"), 60)
 end
 EOF
 
-    # View Template
-    mkdir -p /usr/lib/lua/luci/view
-    cat > /usr/lib/lua/luci/view/libernet-view.htm <<EOF
+mkdir -p /usr/lib/lua/luci/view
+cat > "$LUCI_VIEW" <<EOF
 <%+header%>
 <div class="cbi-map">
     <h2 class="text-center"><%:Libernet Mod Interface%></h2>
@@ -130,28 +116,32 @@ EOF
 </div>
 <%+footer%>
 EOF
-}
 
 # ---------------------------
-# Main Installation
+# Final Configuration
 # ---------------------------
-{
-    create_theme_package
-    install_theme_assets
-    luci_integration
-    
-    echo -e "\nDownloading Libernet core..."
-    wget -O /tmp/libernet.zip "https://github.com/faiz007t/libernetmod/raw/main/libernet.zip"
-    unzip -o /tmp/libernet.zip -d $LIBERNET_DIR
-    
-    echo -e "\nSetting permissions..."
-    chmod -R 755 $LIBERNET_DIR/bin
-    
-    echo -e "\nActivating theme..."
-    /etc/init.d/uhttpd restart
-    uci set luci.themes.$THEME_NAME=$LUCI_THEME_DIR
-    uci commit luci
-} 2>&1 | tee /var/log/libernet-install.log
+echo -e "\nSetting file permissions..."
+chmod 644 "$LUCI_CONTROLLER"
+chmod 644 "$LUCI_VIEW"
 
-echo -e "\n\033[1;32mINSTALLATION COMPLETE!\033[0m"
-echo "Access via: http://$(uci get network.lan.ipaddr)/cgi-bin/luci/admin/services/libernet"
+echo -e "\nRestarting web service..."
+/etc/init.d/uhttpd restart
+
+# ---------------------------
+# Cleanup
+# ---------------------------
+echo -e "\nCleaning up installation files..."
+rm -f /www/libernet.zip
+rm -f "$0"
+
+# ---------------------------
+# Completion Message
+# ---------------------------
+echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
+echo -e "Access Libernet Mod via:"
+echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "2. LuCI Interface: Services Menu -> Libernet"
+echo -e "\nDon't forget to:"
+echo -e "- Clear your browser cache"
+echo -e "- Check installation log at: install.log"
+echo -e "- Backup important configurations\n"
