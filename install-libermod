@@ -33,13 +33,6 @@ echo -e "Extracting file..."
 } &> log-extract.txt
 sleep 2
 
-echo -e "Add Background Music..."
-{
-    mkdir -p /www/libernet/music
-    wget -O /www/libernet/music/music.mp3 --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/music.mp3
-} &> log-install.txt
-sleep 2
-
 echo -e "Mod & Change Theme Color..."
 {
     wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
