@@ -89,12 +89,12 @@ echo -e "\n\033[1;34mStarting Libernet Mod installation process...\033[0m"
 # ---------------------------
 # Custom Theme: CSS and head.php
 # ---------------------------
-echo -e "\n\033[1;34mApplying custom theme...\033[0m"
+echo -e "\n\033[1;34mApplying custom theme and favicon...\033[0m"
 
 # Create libernet directory if missing
 mkdir -p "$LIBERNET_DIR"
 
-# Download favicon to /www/favicon.ico (optional, for browser default)
+# Download favicon to /www/favicon.ico (for all LuCI pages)
 wget -O /www/favicon.ico "$FAVICON_URL"
 
 # Write custom bootstrap.min.css
