@@ -1,239 +1,154 @@
 #!/bin/bash
-# Libernet Mod Installer with Custom Favicon, White Theme, and Result Box Styling
+# Libernet Mod Installer with LuCI Theme Package Integration
 
 set -e
 
 # ---------------------------
 # Configuration Variables
 # ---------------------------
-LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
-LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
+THEME_NAME="libernet-mod"
+LUCI_THEME_DIR="/usr/lib/lua/luci/view/themes/$THEME_NAME"
 LIBERNET_DIR="/www/libernet"
-BACKUP_DIR="/www/libernet_backup_$(date +%s)"
-GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
-FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/icon.ico"
-FAVICON_LOCAL="/www/favicon.ico"
-BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/re.jpg"
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
+BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
 
 # ---------------------------
 # Root Check
 # ---------------------------
-if [[ "$EUID" -ne 0 ]]; then
-   echo "ERROR: Script must be run as root!"
-   exit 1
-fi
-
-# ---------------------------
-# Initialization
-# ---------------------------
-clear
-echo -e "##############################################"
-echo -e "#        Libernet Mod v1.5.4 Installer Pro   #"
-echo -e "##############################################\n"
-echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
-sleep 2
+[ "$EUID" -ne 0 ] && { echo "ERROR: Script must be run as root!"; exit 1; }
 
 # ---------------------------
 # Dependency Check
 # ---------------------------
-check_dependency() {
-    if ! command -v $1 &> /dev/null; then
-        echo "Installing dependency: $1..."
-        opkg update && opkg install $1
-    fi
+check_dep() {
+    command -v $1 >/dev/null 2>&1 || { opkg update; opkg install $1; }
+}
+check_dep unzip
+check_dep wget
+
+# ---------------------------
+# Create LuCI Theme Structure
+# ---------------------------
+create_theme_package() {
+    echo -e "\nCreating LuCI theme package structure..."
+    
+    mkdir -p $LUCI_THEME_DIR/htdocs
+    cat > $LUCI_THEME_DIR/theme.lua <<EOF
+module("luci.theme.libernet-mod", package.seeall")
+
+function get_path(...)
+    return require("luci.fs").joinpath(luci.util.libpath(), "view/themes/libernet-mod", ...)
+end
+
+function get_image_path(...)
+    return get_path("htdocs", ...)
+end
+
+function style(...)
+    return get_path("static/styles", ...)
+end
+EOF
+
+    # Theme registration
+    mkdir -p /etc/uci-defaults
+    cat > /etc/uci-defaults/99-$THEME_NAME-theme <<EOF
+#!/bin/sh
+uci -q batch <<-EOT >/dev/null
+    set luci.themes.$THEME_NAME=/usr/lib/lua/luci/view/themes/$THEME_NAME
+    commit luci
+EOT
+rm -f \$0
+EOF
+    chmod 755 /etc/uci-defaults/99-$THEME_NAME-theme
 }
 
-check_dependency unzip
-check_dependency wget
-
 # ---------------------------
-# Backup Existing Installation
+# Install Theme Assets
 # ---------------------------
-if [ -d "$LIBERNET_DIR" ]; then
-    echo -e "\nCreating backup of previous installation..."
-    cp -r "$LIBERNET_DIR" "$BACKUP_DIR"
-    echo -e "Backup saved at: $BACKUP_DIR\n"
-fi
+install_theme_assets() {
+    echo -e "\nInstalling theme assets..."
+    
+    # Download and install favicon
+    wget -O $LUCI_THEME_DIR/htdocs/favicon.ico $FAVICON_URL
+    ln -sf $LUCI_THEME_DIR/htdocs/favicon.ico /www/favicon.ico
 
-# ---------------------------
-# Download Favicon
-# ---------------------------
-echo -e "\nDownloading favicon..."
-wget -O "$FAVICON_LOCAL" --no-check-certificate "$FAVICON_URL"
+    # Create theme CSS
+    mkdir -p $LUCI_THEME_DIR/static/styles
+    cat > $LUCI_THEME_DIR/static/styles/libernet.css <<EOF
+body {
+    background: url('$BG_URL') no-repeat center center fixed;
+    background-size: cover;
+}
 
-# ---------------------------
-# Main Installation
-# ---------------------------
-echo -e "\nStarting Libernet Mod installation process..."
-{
-    echo -e "\nDownloading main package..."
-    wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
+.panel-default, .panel {
+    background: rgba(255,255,255,0.9) !important;
+    backdrop-filter: blur(5px);
+}
 
-    echo -e "\nExtracting files..."
-    unzip -o "/www/libernet.zip" -d "/www"
+.result-box {
+    background: rgba(255,255,255,0.95) !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
 
-    echo -e "\nInstalling modified files:"
-    declare -A MOD_FILES=(
-        ["system.php"]="system.php"
-        ["navbar.php"]="navbar.php"
-        ["index.php"]="index.php"
-        ["head.php"]="head.php"
-        ["footer.php"]="footer.php"
-        ["config.php"]="config.php"
-        ["about.php"]="about.php"
-        ["bootstrap.min.css"]="bootstrap.min.css"
-        ["ping-loop.sh"]="ping-loop.sh"
-    )
+.navbar {
+    background: rgba(0,31,63,0.9) !important;
+    backdrop-filter: blur(5px);
+}
+EOF
 
-    for file in "${!MOD_FILES[@]}"; do
-        echo " - ${MOD_FILES[$file]}"
-        wget -O "${LIBERNET_DIR}/${MOD_FILES[$file]}" --no-check-certificate "${GITHUB_BASE}/${file}"
-    done
-
-    echo -e "\nSetting file permissions..."
-    chmod +x "/root/libernet/bin/ping-loop.sh"
-} 2>&1 | tee install.log
+    # Link theme resources
+    ln -s $LUCI_THEME_DIR/static /www/static/$THEME_NAME
+}
 
 # ---------------------------
 # LuCI Integration
 # ---------------------------
-echo -e "\nCreating LuCI integration..."
-cat > $LUCI_CONTROLLER <<'EOF'
+luci_integration() {
+    echo -e "\nCreating LuCI integration..."
+    
+    # Controller
+    mkdir -p /usr/lib/lua/luci/controller
+    cat > /usr/lib/lua/luci/controller/libernet.lua <<EOF
 module("luci.controller.libernet", package.seeall)
 
 function index()
-    entry({"admin", "services", "libernet"}, template("libernet"), _("Libernet"), 55).leaf = true
+    entry({"admin", "services", "libernet"}, template("libernet-view"), _("Libernet"), 60)
 end
 EOF
 
-cat > $LUCI_VIEW <<EOF
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Libernet Mod | Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: #222;
-      touch-action: manipulation;
-      background-image: url('$BG_URL');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-attachment: fixed;
-      background-size: cover;
-    }
-    #libernet {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-      background: transparent;
-    }
-    #luci-back {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: #fff;
-      border: none;
-      border-radius: 50%;
-      padding: 8px;
-      width: 48px;
-      height: 48px;
-      cursor: pointer;
-      transition: all 0.2s;
-      touch-action: manipulation;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #luci-back svg {
-      width: 28px;
-      height: 28px;
-      fill: #000;
-    }
-    @media (max-width: 768px) {
-      #luci-back {
-        width: 44px;
-        height: 44px;
-        top: 8px;
-        left: 8px;
-      }
-      #luci-back svg {
-        width: 24px;
-        height: 24px;
-      }
-    }
-    /* --- Libernet UI (iframe) style hints for developer --- */
-    /* Fixed white navbar and hamburger icon: */
-    /* .navbar, .navbar-box { background: #fff !important; }
-       .navbar-icon, .navbar-toggler-icon {
-         color: #fff !important; background: #000 !important;
-         /* For Bootstrap 4/5: */
-         /* background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); */
-       }
-       .navbar-text { color: #000 !important; }
-    */
-    /* Result box: */
-    .result-box, #result {
-      background: #fff !important;
-      color: #000 !important;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin: 16px 0;
-    }
-  </style>
-</head>
-<body>
-  <button id="luci-back"
-          role="button"
-          aria-label="Return to LuCI interface"
-          onclick="window.location.href='http://' + window.location.hostname + '/cgi-bin/luci/'">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-    </svg>
-  </button>
-  <iframe id="libernet" scrolling="auto"></iframe>
-  <script>
-    document.getElementById("libernet").src = "http://" + window.location.hostname + "/libernet";
-  </script>
-</body>
-</html>
+    # View Template
+    mkdir -p /usr/lib/lua/luci/view
+    cat > /usr/lib/lua/luci/view/libernet-view.htm <<EOF
+<%+header%>
+<div class="cbi-map">
+    <h2 class="text-center"><%:Libernet Mod Interface%></h2>
+    <iframe src="/libernet" style="width:100%; height:80vh; border:none; background:transparent;"></iframe>
+</div>
+<%+footer%>
 EOF
+}
 
 # ---------------------------
-# Final Configuration
+# Main Installation
 # ---------------------------
-echo -e "\nSetting file permissions..."
-chmod 644 $LUCI_CONTROLLER
-chmod 644 $LUCI_VIEW
+{
+    create_theme_package
+    install_theme_assets
+    luci_integration
+    
+    echo -e "\nDownloading Libernet core..."
+    wget -O /tmp/libernet.zip "https://github.com/faiz007t/libernetmod/raw/main/libernet.zip"
+    unzip -o /tmp/libernet.zip -d $LIBERNET_DIR
+    
+    echo -e "\nSetting permissions..."
+    chmod -R 755 $LIBERNET_DIR/bin
+    
+    echo -e "\nActivating theme..."
+    /etc/init.d/uhttpd restart
+    uci set luci.themes.$THEME_NAME=$LUCI_THEME_DIR
+    uci commit luci
+} 2>&1 | tee /var/log/libernet-install.log
 
-echo -e "\nRestarting web service..."
-/etc/init.d/uhttpd restart
-
-# ---------------------------
-# Cleanup
-# ---------------------------
-echo -e "\nCleaning up installation files..."
-rm -f "/www/libernet.zip"
-rm -f "$0"
-
-# ---------------------------
-# Completion Message
-# ---------------------------
-echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
-echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[4mhttp://\$(uci get network.lan.ipaddr)/libernet\033[0m"
-echo -e "2. LuCI Interface: Services Menu -> Libernet"
-echo -e "\nFavicon is now set for the Libernet LuCI page."
-echo -e "- Result box is white with black text."
-echo -e "- Navbar and hamburger icon are white (see CSS hints)."
-echo -e "- Clear your browser cache if you don't see the new icon."
-echo -e "- Check installation log at: install.log"
-echo -e "- Backup important configurations\n"
+echo -e "\n\033[1;32mINSTALLATION COMPLETE!\033[0m"
+echo "Access via: http://$(uci get network.lan.ipaddr)/cgi-bin/luci/admin/services/libernet"
