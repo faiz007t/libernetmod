@@ -1,6 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration
-# Combined script with enhanced error handling and styling
+# Libernet Mod Installer with Custom Favicon and White Theme
 
 set -e
 
@@ -12,12 +11,15 @@ LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
 LIBERNET_DIR="/www/libernet"
 BACKUP_DIR="/www/libernet_backup_$(date +%s)"
 GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
+FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/icon.ico"
+FAVICON_LOCAL="/www/favicon.ico"
+BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/re.jpg"
 
 # ---------------------------
 # Root Check
 # ---------------------------
 if [[ "$EUID" -ne 0 ]]; then
-   echo "ERROR: Script must be run as root!" 
+   echo "ERROR: Script must be run as root!"
    exit 1
 fi
 
@@ -54,20 +56,26 @@ if [ -d "$LIBERNET_DIR" ]; then
 fi
 
 # ---------------------------
+# Download Favicon
+# ---------------------------
+echo -e "\nDownloading favicon..."
+wget -O "$FAVICON_LOCAL" --no-check-certificate "$FAVICON_URL"
+
+# ---------------------------
 # Main Installation
 # ---------------------------
 echo -e "\nStarting Libernet Mod installation process..."
 {
     echo -e "\nDownloading main package..."
     wget -O "/www/libernet.zip" --no-check-certificate "${GITHUB_BASE}/libernet.zip"
-    
+
     echo -e "\nExtracting files..."
     unzip -o "/www/libernet.zip" -d "/www"
-    
+
     echo -e "\nInstalling modified files:"
     declare -A MOD_FILES=(
         ["system.php"]="system.php"
-        ["navbar.php"]="navbar.php" 
+        ["navbar.php"]="navbar.php"
         ["index.php"]="index.php"
         ["head.php"]="head.php"
         ["footer.php"]="footer.php"
@@ -98,12 +106,13 @@ function index()
 end
 EOF
 
-cat > $LUCI_VIEW <<'EOF'
+cat > $LUCI_VIEW <<EOF
 <!DOCTYPE html>
 <html>
 <head>
   <title>Libernet Mod | Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <style>
     html, body {
       height: 100%;
@@ -111,19 +120,25 @@ cat > $LUCI_VIEW <<'EOF'
       padding: 0;
       background: #222;
       touch-action: manipulation;
+      background-image: url('$BG_URL');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+      background-size: cover;
     }
     #libernet {
       width: 100vw;
       height: 100vh;
       border: none;
       display: block;
+      background: transparent;
     }
     #luci-back {
       position: fixed;
       top: 10px;
       left: 10px;
       z-index: 1000;
-      background: rgba(0,0,0,0.7);
+      background: #fff;
       border: none;
       border-radius: 50%;
       padding: 8px;
@@ -132,11 +147,15 @@ cat > $LUCI_VIEW <<'EOF'
       cursor: pointer;
       transition: all 0.2s;
       touch-action: manipulation;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #luci-back svg {
       width: 28px;
       height: 28px;
-      fill: white;
+      fill: #000;
     }
     @media (max-width: 768px) {
       #luci-back {
@@ -150,6 +169,11 @@ cat > $LUCI_VIEW <<'EOF'
         height: 24px;
       }
     }
+    /* Navbar (inside iframe) style suggestion for developer:
+      .navbar, .navbar-box { background: #fff !important; }
+      .navbar-icon, .navbar-toggler-icon { color: #fff !important; background: #000 !important; }
+      .navbar-text { color: #000 !important; }
+    */
   </style>
 </head>
 <body>
@@ -161,9 +185,7 @@ cat > $LUCI_VIEW <<'EOF'
       <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
     </svg>
   </button>
-
   <iframe id="libernet" scrolling="auto"></iframe>
-
   <script>
     document.getElementById("libernet").src = "http://" + window.location.hostname + "/libernet";
   </script>
@@ -193,9 +215,9 @@ rm -f "$0"
 # ---------------------------
 echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
 echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
+echo -e "1. Web Interface: \033[4mhttp://\$(uci get network.lan.ipaddr)/libernet\033[0m"
 echo -e "2. LuCI Interface: Services Menu -> Libernet"
-echo -e "\nDon't forget to:"
-echo -e "- Clear your browser cache"
+echo -e "\nFavicon is now set for the Libernet LuCI page."
+echo -e "- Clear your browser cache if you don't see the new icon."
 echo -e "- Check installation log at: install.log"
 echo -e "- Backup important configurations\n"
