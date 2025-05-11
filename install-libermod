@@ -34,7 +34,7 @@ create_theme_package() {
     
     mkdir -p $LUCI_THEME_DIR/htdocs
     cat > $LUCI_THEME_DIR/theme.lua <<EOF
-module("luci.theme.libernet-mod", package.seeall")
+module("luci.theme.libernet-mod", package.seeall)
 
 function get_path(...)
     return require("luci.fs").joinpath(luci.util.libpath(), "view/themes/libernet-mod", ...)
@@ -68,6 +68,9 @@ EOF
 install_theme_assets() {
     echo -e "\nInstalling theme assets..."
     
+    # Create required directories
+    mkdir -p /www/static  # Fixes missing directory error
+    
     # Download and install favicon
     wget -O $LUCI_THEME_DIR/htdocs/favicon.ico $FAVICON_URL
     ln -sf $LUCI_THEME_DIR/htdocs/favicon.ico /www/favicon.ico
@@ -97,8 +100,8 @@ body {
 }
 EOF
 
-    # Link theme resources
-    ln -s $LUCI_THEME_DIR/static /www/static/$THEME_NAME
+    # Link theme resources with proper symlink handling
+    ln -sfn $LUCI_THEME_DIR/static /www/static/$THEME_NAME
 }
 
 # ---------------------------
