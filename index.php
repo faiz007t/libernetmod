@@ -146,17 +146,17 @@
                                     }">{{ connectionText }}</span>
                                     <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                 </div>
-                                <!-- Ping: Always second -->
+                                <!-- IP: Now second -->
+                                <div class="col-lg-6 col-md-6">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
+                                </div>
+                                <!-- Ping: Now third -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
                                     <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
                                         <span class="ping-heartbeat" id="ping-heartbeat"></span>
                                     </i>
                                     <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
-                                </div>
-                                <!-- IP: Always third -->
-                                <div class="col-lg-6 col-md-6">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
                                 </div>
                                 <!-- ISP: Always fourth -->
                                 <div class="col-lg-6 col-md-6 pb-lg-1">
