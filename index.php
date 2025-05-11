@@ -278,13 +278,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
             // Vue reactive property
-            if (window.app && window.app.log !== undefined) {
+            if (window.app && typeof window.app.log !== "undefined") {
                 window.app.log = '';
-            } else {
-                // fallback: clear the <pre> directly
-                var logBox = document.querySelector('pre[ref="log"]');
-                if (logBox) logBox.innerHTML = '';
             }
+            // Always clear the <pre> directly as well
+            var logBox = document.querySelector('pre[ref="log"]');
+            if (logBox) logBox.innerHTML = '';
         });
     }
     setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
