@@ -8,6 +8,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="icon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
+    <!-- Ensure Font Awesome is loaded -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
     body {
         background-image: url('https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg');
