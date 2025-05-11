@@ -128,9 +128,22 @@
                                         </label>
                                     </div>
                                 </div>
+                                <!-- Status Section: ICON IS NOW DISTINCT -->
                                 <div class="col-lg-6 col-md-6">
-									<i class="fa fa-flag"></i>
-                                    <span class="text-primary">Status: </span><span :class="{ 'text-primary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }">{{ connectionText }}</span>
+                                    <i 
+                                      :class="[
+                                        connection === 0 ? 'fa fa-circle text-primary' :
+                                        connection === 1 ? 'fa fa-exclamation-circle text-warning' :
+                                        connection === 2 ? 'fa fa-check-circle text-success' :
+                                        connection === 3 ? 'fa fa-info-circle text-info' : 'fa fa-circle'
+                                      ]"
+                                      aria-hidden="true"
+                                      style="margin-right: 4px;"
+                                    ></i>
+                                    <span class="text-primary">Status: </span>
+                                    <span :class="{ 'text-primary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }">
+                                        {{ connectionText }}
+                                    </span>
                                     <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                 </div>
                                 <!-- WAN Info Section (HTML + JS) -->
