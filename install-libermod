@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar, White Icons, Directory Backup, Favicon)
+# Libernet Mod Installer with LuCI Integration (Dark Theme Edition)
 
 set -e
 
@@ -11,8 +11,6 @@ LUCI_VIEW="/usr/lib/lua/luci/view/libernet.htm"
 LIBERNET_DIR="/www/libernet"
 BACKUP_DIR="/www/libernet_backup_$(date +%s)"
 GITHUB_BASE="https://raw.githubusercontent.com/faiz007t/libernetmod/main"
-REMOTE_BG="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/re.jpg"
-FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/refs/heads/main/icon.ico"
 
 # ---------------------------
 # Root Check
@@ -46,7 +44,7 @@ check_dependency unzip
 check_dependency wget
 
 # ---------------------------
-# Backup Existing Installation (as Directory)
+# Backup Existing Installation
 # ---------------------------
 if [ -d "$LIBERNET_DIR" ]; then
     echo -e "\n\033[1;33mCreating backup of previous installation...\033[0m"
@@ -74,6 +72,7 @@ echo -e "\n\033[1;34mStarting Libernet Mod installation process...\033[0m"
         ["footer.php"]="footer.php"
         ["config.php"]="config.php"
         ["about.php"]="about.php"
+        ["bootstrap.min.css"]="bootstrap.min.css"
         ["ping-loop.sh"]="ping-loop.sh"
     )
 
@@ -87,138 +86,10 @@ echo -e "\n\033[1;34mStarting Libernet Mod installation process...\033[0m"
 } 2>&1 | tee install.log
 
 # ---------------------------
-# Custom Theme: CSS and head.php
-# ---------------------------
-echo -e "\n\033[1;34mApplying custom theme and favicon...\033[0m"
-
-# Create libernet directory if missing
-mkdir -p "$LIBERNET_DIR"
-
-# Download favicon to /www/favicon.ico (for all LuCI and web pages)
-wget -O /www/favicon.ico "$FAVICON_URL"
-
-# Write custom bootstrap.min.css
-cat > "${LIBERNET_DIR}/bootstrap.min.css" <<EOF
-body, .container, .container-fluid {
-  background: transparent !important;
-  color: #000 !important;
-}
-.panel-default, .panel {
-  background: rgba(255,255,255,0.3) !important;
-  border-color: #333 !important;
-  color: #000 !important;
-}
-.btn-default {
-  background-color: #001f3f !important;
-  border-color: #001f3f !important;
-  color: #000 !important;
-}
-.form-control {
-  background: rgba(255,255,255,0.1) !important;
-  color: #000 !important;
-  border-color: #333 !important;
-}
-.navbar, .navbar-default {
-  background-color: #001f3f !important;
-  border-color: #001f3f !important;
-  color: #fff !important;
-}
-/* Make toggler/hamburger icon white */
-.navbar .navbar-toggler .navbar-toggler-icon,
-.navbar-default .navbar-toggler .navbar-toggler-icon,
-.navbar .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'><path stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/></svg>");
-}
-.icon-bar {
-  background-color: #fff !important;
-}
-/* Make back icon in navbar white (if any) */
-.navbar .back-icon svg,
-.navbar .navbar-back svg,
-.navbar .navbar-back-icon svg {
-  fill: #fff !important;
-}
-.navbar .back-icon,
-.navbar .navbar-back,
-.navbar .navbar-back-icon {
-  color: #fff !important;
-}
-html {
-  background: url("$REMOTE_BG") no-repeat center center fixed !important;
-  background-size: cover !important;
-}
-EOF
-
-# Write custom head.php
-cat > "${LIBERNET_DIR}/head.php" <<EOF
-<?php
-echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
-echo '<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">';
-echo '<link rel="icon" type="image/x-icon" href="$FAVICON_URL">';
-echo '<link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">';
-echo '<style>
-  html, body, .container, .container-fluid {
-    background: transparent !important;
-    color: #000 !important;
-  }
-  html {
-    background: url("$REMOTE_BG") no-repeat center center fixed !important;
-    background-size: cover !important;
-  }
-  .panel-default, .panel {
-    background: rgba(255,255,255,0.3) !important;
-    border-color: #333 !important;
-    color: #000 !important;
-  }
-  .btn-default {
-    background-color: #001f3f !important;
-    border-color: #001f3f !important;
-    color: #000 !important;
-  }
-  .form-control {
-    background: rgba(255,255,255,0.1) !important;
-    color: #000 !important;
-    border-color: #333 !important;
-  }
-  .navbar, .navbar-default {
-    background-color: #001f3f !important;
-    border-color: #001f3f !important;
-    color: #fff !important;
-  }
-  /* Make toggler/hamburger icon white */
-  .navbar .navbar-toggler .navbar-toggler-icon,
-  .navbar-default .navbar-toggler .navbar-toggler-icon,
-  .navbar .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;utf8,<svg viewBox=\'0 0 30 30\' xmlns=\'http://www.w3.org/2000/svg\'><path stroke=\'rgba(255,255,255,1)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' d=\'M4 7h22M4 15h22M4 23h22\'/></svg>");
-  }
-  .icon-bar {
-    background-color: #fff !important;
-  }
-  /* Make back icon in navbar white (if any) */
-  .navbar .back-icon svg,
-  .navbar .navbar-back svg,
-  .navbar .navbar-back-icon svg {
-    fill: #fff !important;
-  }
-  .navbar .back-icon,
-  .navbar .navbar-back,
-  .navbar .navbar-back-icon {
-    color: #fff !important;
-  }
-</style>';
-?>
-EOF
-
-# ---------------------------
-# LuCI Integration (Custom View)
+# LuCI Integration (Dark Theme)
 # ---------------------------
 echo -e "\n\033[1;34mCreating LuCI integration...\033[0m"
-
-# Ensure directories exist
-mkdir -p "$(dirname "$LUCI_CONTROLLER")"
-mkdir -p "$(dirname "$LUCI_VIEW")"
-
-cat > "$LUCI_CONTROLLER" <<'EOF'
+cat > $LUCI_CONTROLLER <<'EOF'
 module("luci.controller.libernet", package.seeall)
 
 function index()
@@ -226,24 +97,19 @@ function index()
 end
 EOF
 
-cat > "$LUCI_VIEW" <<EOF
+cat > $LUCI_VIEW <<'EOF'
 <!DOCTYPE html>
 <html>
 <head>
   <title>Libernet Mod | Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/x-icon" href="$FAVICON_URL">
-  <link rel="shortcut icon" type="image/x-icon" href="$FAVICON_URL">
   <style>
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
-      background: url("$REMOTE_BG") no-repeat center center fixed !important;
-      background-size: cover !important;
-      color: #000 !important;
+      background: #181818;
+      color: #e0e0e0;
       touch-action: manipulation;
     }
     #libernet {
@@ -251,8 +117,8 @@ cat > "$LUCI_VIEW" <<EOF
       height: 100vh;
       border: none;
       display: block;
-      background: transparent;
-      color: #000 !important;
+      background: #181818;
+      color: #e0e0e0;
     }
     #luci-back {
       position: fixed;
@@ -272,9 +138,7 @@ cat > "$LUCI_VIEW" <<EOF
     #luci-back svg {
       width: 28px;
       height: 28px;
-      fill: #fff !important;
-      color: #fff !important;
-      /* This ensures the back icon is always white */
+      fill: #e0e0e0;
     }
     @media (max-width: 768px) {
       #luci-back {
@@ -288,35 +152,6 @@ cat > "$LUCI_VIEW" <<EOF
         height: 24px;
       }
     }
-    /* Ensure text inside boxes is black */
-    .panel-default, .panel, .btn-default, .form-control {
-      color: #000 !important;
-    }
-    .navbar, .navbar-default {
-      background-color: #001f3f !important;
-      border-color: #001f3f !important;
-      color: #fff !important;
-    }
-    /* Make toggler/hamburger icon white */
-    .navbar .navbar-toggler .navbar-toggler-icon,
-    .navbar-default .navbar-toggler .navbar-toggler-icon,
-    .navbar .navbar-toggler-icon {
-      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'><path stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/></svg>");
-    }
-    .icon-bar {
-      background-color: #fff !important;
-    }
-    /* Make back icon in navbar white (if any) */
-    .navbar .back-icon svg,
-    .navbar .navbar-back svg,
-    .navbar .navbar-back-icon svg {
-      fill: #fff !important;
-    }
-    .navbar .back-icon,
-    .navbar .navbar-back,
-    .navbar .navbar-back-icon {
-      color: #fff !important;
-    }
   </style>
 </head>
 <body>
@@ -324,7 +159,7 @@ cat > "$LUCI_VIEW" <<EOF
           role="button"
           aria-label="Return to LuCI interface"
           onclick="window.location.href='http://' + window.location.hostname + '/cgi-bin/luci/'">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#fff">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
     </svg>
   </button>
@@ -339,11 +174,71 @@ cat > "$LUCI_VIEW" <<EOF
 EOF
 
 # ---------------------------
+# Overwrite bootstrap.min.css with dark theme
+# ---------------------------
+cat > "${LIBERNET_DIR}/bootstrap.min.css" <<'EOF'
+body, .container, .container-fluid {
+  background-color: #181818 !important;
+  color: #e0e0e0 !important;
+}
+.panel-default, .panel {
+  background-color: #232323 !important;
+  border-color: #333 !important;
+}
+.btn-default {
+  background-color: #292929 !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+.form-control {
+  background-color: #232323 !important;
+  color: #e0e0e0 !important;
+  border-color: #333 !important;
+}
+.navbar, .navbar-default {
+  background-color: #232323 !important;
+  border-color: #333 !important;
+}
+EOF
+
+# ---------------------------
+# Overwrite head.php for dark theme
+# ---------------------------
+cat > "${LIBERNET_DIR}/head.php" <<'EOF'
+<?php
+echo '<style>
+  body, .container, .container-fluid {
+    background-color: #181818 !important;
+    color: #e0e0e0 !important;
+  }
+  .panel-default, .panel {
+    background-color: #232323 !important;
+    border-color: #333 !important;
+  }
+  .btn-default {
+    background-color: #292929 !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+  }
+  .form-control {
+    background-color: #232323 !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+  }
+  .navbar, .navbar-default {
+    background-color: #232323 !important;
+    border-color: #333 !important;
+  }
+</style>';
+?>
+EOF
+
+# ---------------------------
 # Final Configuration
 # ---------------------------
 echo -e "\n\033[1;34mSetting file permissions...\033[0m"
-chmod 644 "$LUCI_CONTROLLER"
-chmod 644 "$LUCI_VIEW"
+chmod 644 $LUCI_CONTROLLER
+chmod 644 $LUCI_VIEW
 
 echo -e "\n\033[1;34mRestarting web service...\033[0m"
 /etc/init.d/uhttpd restart
