@@ -57,13 +57,13 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-body py-0 px-0">
-						<form @submit.prevent="runLibernet">
+                        <!-- Main Connection Form -->
+                        <form @submit.prevent="runLibernet">
                             <div class="form-group form-row my-auto">
                                 <div class="col-lg-4 col-md-4 form-row py-1">
                                     <div class="col-lg-4 col-md-3 my-auto">
                                         <label class="my-auto">Mode</label>
-									</div>
+                                    </div>
                                     <div class="col">
                                         <select class="form-control" v-model.number="config.mode" :disabled="status === true" required>
                                             <option v-for="mode in config.temp.modes" :value="mode.value">{{ mode.name }}</option>
@@ -73,7 +73,7 @@
                                 <div class="col-lg-4 col-md-4 form-row py-1">
                                     <div class="col-lg-4 col-md-3 my-auto">
                                         <label class="my-auto" >Config</label>
-									</div>
+                                    </div>
                                     <div class="col">
                                         <select class="form-control" v-model="config.profile" :disabled="status === true" required>
                                             <option v-for="profile in config.profiles" :value="profile">{{ profile }}</option>
@@ -87,92 +87,99 @@
                                 </div>
                             </div>
                         </form>
-                            <div class="row">
-                                <!-- Checkbox settings: always fixed -->
-                                <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy">
-                                        <label class="form-check-label" for="tun2socks-legacy">
-                                            Use tun2socks legacy
-                                        </label>
+                        <!-- BEGIN: Box UI for Settings and Status -->
+                        <div class="card mt-3">
+                            <div class="card-header text-center">
+                                <strong>System Controls & Status</strong>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <!-- Checkbox settings -->
+                                    <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" v-model="config.system.tun2socks.legacy" :disabled="status === true" id="tun2socks-legacy">
+                                            <label class="form-check-label" for="tun2socks-legacy">
+                                                Use tun2socks legacy
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 pb-lg-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
+                                            <label class="form-check-label" for="autostart">
+                                                Auto start Libernet on boot
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 pb-lg-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status === true" id="dns-resolver">
+                                            <label class="form-check-label" for="dns-resolver">
+                                                DNS resolver
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 pb-lg-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="config.system.system.memory_cleaner" :disabled="status === true" id="memory-cleaner">
+                                            <label class="form-check-label" for="memory-cleaner">
+                                                Memory cleaner
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 pb-lg-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.ping_loop" :disabled="status === true" id="ping-loop">
+                                            <label class="form-check-label" for="ping-loop">
+                                                PING loop
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
-                                        <label class="form-check-label" for="autostart">
-                                            Auto start Libernet on boot
-                                        </label>
+                                <hr>
+                                <div class="row">
+                                    <!-- Status Info -->
+                                    <div class="col-lg-6 col-md-6">
+                                        <i :class="{
+                                            'fa fa-circle text-muted': connection === 0,
+                                            'fa fa-spinner fa-spin text-info': connection === 1,
+                                            'fa fa-check-circle text-success': connection === 2,
+                                            'fa fa-exclamation-circle text-danger': connection === 3
+                                        }"></i>
+                                        <span class="text-primary">Status: </span>
+                                        <span :class="{
+                                            'text-muted': connection === 0,
+                                            'text-info': connection === 1,
+                                            'text-success': connection === 2,
+                                            'text-danger': connection === 3
+                                        }">{{ connectionText }}</span>
+                                        <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
                                     </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status === true" id="dns-resolver">
-                                        <label class="form-check-label" for="dns-resolver">
-                                            DNS resolver
-                                        </label>
+                                    <div class="col-lg-6 col-md-6">
+                                        <i class="fa fa-globe"></i>
+                                        <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
                                     </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.system.memory_cleaner" :disabled="status === true" id="memory-cleaner">
-                                        <label class="form-check-label" for="memory-cleaner">
-                                            Memory cleaner
-                                        </label>
+                                    <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
+                                        <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
+                                            <span class="ping-heartbeat" id="ping-heartbeat"></span>
+                                        </i>
+                                        <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
                                     </div>
-                                </div>
-                                <div class="col-md-12 pb-lg-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.ping_loop" :disabled="status === true" id="ping-loop">
-                                        <label class="form-check-label" for="ping-loop">
-                                            PING loop
-                                        </label>
+                                    <div class="col-lg-6 col-md-6 pb-lg-1">
+                                        <i class="fa fa-server"></i>
+                                        <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
                                     </div>
-                                </div>
-                                <!-- Status: Always first -->
-                                <div class="col-lg-6 col-md-6">
-                                    <i :class="{
-                                        'fa fa-circle text-muted': connection === 0,
-                                        'fa fa-spinner fa-spin text-info': connection === 1,
-                                        'fa fa-check-circle text-success': connection === 2,
-                                        'fa fa-exclamation-circle text-danger': connection === 3
-                                    }"></i>
-                                    <span class="text-primary">Status: </span>
-                                    <span :class="{
-                                        'text-muted': connection === 0,
-                                        'text-info': connection === 1,
-                                        'text-success': connection === 2,
-                                        'text-danger': connection === 3
-                                    }">{{ connectionText }}</span>
-                                    <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
-                                </div>
-                                <!-- IP: Now second -->
-                                <div class="col-lg-6 col-md-6">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
-                                </div>
-                                <!-- Ping: Now third -->
-                                <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
-                                    <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
-                                        <span class="ping-heartbeat" id="ping-heartbeat"></span>
-                                    </i>
-                                    <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
-                                </div>
-                                <!-- ISP: Always fourth -->
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <i class="fa fa-server"></i>
-                                    <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
-                                </div>
-                                <!-- End WAN Info Section -->
-				<div class="col-12 mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
-                                        <i class="fa fa-refresh"></i> Refresh Info
-                                    </button>
-                                </div>
-                                <div class="col pt-2">
-                                    <pre ref="log" v-html="log" class="form-control text-left" style="height: auto; width: auto; font-size:80%; background-image-position: center; background-color: #444b8a "></pre>
+                                    <div class="col-12 mb-2">
+                                        <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
+                                            <i class="fa fa-refresh"></i> Refresh Info
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                        <!-- END: Box UI -->
+                        <div class="col pt-2">
+                            <pre ref="log" v-html="log" class="form-control text-left" style="height: auto; width: auto; font-size:80%; background-image-position: center; background-color: #444b8a "></pre>
                         </div>
                     </div>
                 </div>
