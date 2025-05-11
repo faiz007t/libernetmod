@@ -1,173 +1,103 @@
 #!/bin/bash
 
-set -e
+# Libermod Installer by Hanif Widi Widodo - Improved Version
 
-# ---------------------------
-# Initialization
-# ---------------------------
 clear
-echo -e "#################################################"
-echo -e "#       Libernet Mod v1.5.4 Installer Pro       #"
-echo -e "#################################################\n"
-echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
+echo "#############################################"
+echo "#  Libermod Installer by Hanif Widi Widodo  #"
+echo "#############################################"
+echo
+sleep 1
+echo "* Sebelum install libermod pastikan sudah terinstall libernet sebelumnya *"
+echo
+sleep 1
+echo "- REMOVE LOGIN PAGE"
+echo "- REMOVE SPEEDTEST PAGE"
+echo "- CHANGE THEME COLOR"
+echo "- CHANGE BACKGROUND IMAGE"
+echo "- ADD BACKGROUND MUSIC"
+echo "- FIX BENGONG (InshaAllah Aman)"
+echo
 sleep 2
 
-# ---------------------------
-# Dependency Check
-# ---------------------------
-check_dep() {
-    command -v "$1" >/dev/null 2>&1 || { opkg update && opkg install "$1"; }
-}
-check_dep unzip
-check_dep wget
+# Check for required commands
+for cmd in opkg wget unzip; do
+    if ! command -v $cmd &>/dev/null; then
+        echo "ERROR: Command '$cmd' not found! Please install it first."
+        exit 1
+    fi
+done
 
-echo -e "Downloading file..."
+echo "Harap tunggu, libermod segera di install..."
+sleep 1
+echo "#"
+sleep 1
+echo "##"
+sleep 1
+echo "###"
+sleep 1
+
+echo "Downloading file..."
 {
-    wget -O /www/libernet.zip --no-check-certificate https://github.com/hanifwidi17/libermod/raw/main/libernet.zip
+    opkg install unzip
+    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to download libernet.zip"
+        exit 1
+    fi
     rm -rf /www/libernet
 } &> log-download.txt
 
-echo -e "Extracting file..."
+echo "Extracting file..."
 {
-    unzip /www/libernet.zip -d /www
+    unzip -o /www/libernet.zip -d /www
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to unzip libernet.zip"
+        exit 1
+    fi
 } &> log-extract.txt
 sleep 2
 
-echo -e "Mod & Change Theme Color..."
+echo "Mod & Change Theme Color..."
 {
-    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/system.php
-    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/navbar.php
+    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
+    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
     wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
-    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/head.php
-    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/footer.php
-    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
-    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
+    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
+    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
+    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
+    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
     wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
     wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
     wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
     wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
 
-# THEME & FAVICON IMPROVEMENTS
-echo -e "Improving theme and favicon settings..."
+# Set proper permissions
+chmod -R 755 /www/libernet
 
-FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
-BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
-THEME_NAME="libernet-mod"
-LUCI_THEME_DIR="/usr/lib/lua/luci/view/themes/$THEME_NAME"
-LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
-LUCI_VIEW="/usr/lib/lua/luci/view/libernet-view.htm"
-
-# Ensure /www/static exists before symlinking
-mkdir -p /www/static
-
-# Download and install favicon for all pages
-mkdir -p "$LUCI_THEME_DIR/htdocs"
-wget -O "$LUCI_THEME_DIR/htdocs/favicon.ico" "$FAVICON_URL"
-ln -sf "$LUCI_THEME_DIR/htdocs/favicon.ico" /www/favicon.ico
-
-# Create theme CSS with improved result box styling, white navbar toggler, and unified icon color
-ICON_COLOR="#00bcd4" # Cyan (change this to any color you want)
-mkdir -p "$LUCI_THEME_DIR/static/styles"
-cat > "$LUCI_THEME_DIR/static/styles/libernet.css" <<EOF
-body {
-    background: url('$BG_URL') no-repeat center center fixed;
-    background-size: cover;
-}
-.panel-default, .panel {
-    background: rgba(255,255,255,0.9) !important;
-    backdrop-filter: blur(5px);
-}
-/* Result/Log box: support all common selectors */
-.result-box,
-#result,
-pre.result-box,
-pre#result,
-pre.form-control,
-pre[ref="log"] {
-    background: #fff !important;
-    color: #000 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08) !important;
-    padding: 16px !important;
-    margin: 16px 0 !important;
-}
-.navbar {
-    background: rgba(0,31,63,0.9) !important;
-    backdrop-filter: blur(5px);
-}
-/* Make Bootstrap navbar toggler icon (hamburger) white */
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-}
-.navbar-toggler {
-    border-color: #fff;
-}
-/* Unified icon color for Font Awesome and emoji */
-.icon-cyan, .icon-cyan i, .icon-cyan .fa, .icon-cyan .fas, .icon-cyan .far, .icon-cyan .fab, .icon-cyan .fa-solid, .icon-cyan .fa-regular, .icon-cyan .fa-brands, .icon-cyan span.emoji {
-    color: $ICON_COLOR !important;
-}
-EOF
-
-# Link theme resources with proper symlink handling
-ln -sfn "$LUCI_THEME_DIR/static" "/www/static/$THEME_NAME"
-
-# Make sure head.php always sets the background for all pages, loads Font Awesome, and uses the icon-cyan class
-cat > /www/libernet/head.php <<EOF
-<?php
-echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
-echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">';
-echo '<link rel="stylesheet" href="/static/libernet-mod/styles/libernet.css">';
-echo '<style>
-body { min-height: 100vh !important; }
-</style>';
-?>
-EOF
-
-# LuCI controller and view for menu integration
-mkdir -p /usr/lib/lua/luci/controller
-cat > "$LUCI_CONTROLLER" <<EOF
-module("luci.controller.libernet", package.seeall)
-function index()
-    entry({"admin", "services", "libernet"}, template("libernet-view"), _("Libernet"), 60)
-end
-EOF
-
-mkdir -p /usr/lib/lua/luci/view
-cat > "$LUCI_VIEW" <<EOF
-<%+header%>
-<div class="cbi-map">
-    <h2 class="text-center"><%:Libernet Mod Interface%></h2>
-    <iframe src="/libernet" style="width:100%; height:80vh; border:none; background:transparent;"></iframe>
-</div>
-<%+footer%>
-EOF
-
-# ---------------------------
-# Final Configuration
-# ---------------------------
-echo -e "\nSetting file permissions..."
-chmod 644 "$LUCI_CONTROLLER"
-chmod 644 "$LUCI_VIEW"
-
-echo -e "\nRestarting web service..."
-/etc/init.d/uhttpd restart
-
-# ---------------------------
-# Cleanup
-# ---------------------------
-echo -e "\nCleaning up installation files..."
+# Clean up
 rm -f /www/libernet.zip
-rm -f "$0"
+rm -f install-libermod
 
-# ---------------------------
-# Completion Message
-# ---------------------------
-echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
-echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
-echo -e "2. LuCI Interface: Services Menu -> Libernet"
-echo -e "\nDon't forget to:"
-echo -e "- Clear your browser cache"
-echo -e "- Check installation log at: install.log"
-echo -e "- Backup important configurations\n"
+# PHP error reporting for debugging (optional)
+php_error_file="/www/libernet/index.php"
+if grep -q "<?php" "$php_error_file"; then
+    sed -i '1i\
+<?php\
+ini_set("display_errors", 1);\
+ini_set("display_startup_errors", 1);\
+error_reporting(E_ALL);\
+?>' "$php_error_file"
+fi
+
+echo
+echo "PROSES PEMASANGAN LIBERMOD SELESAI!"
+echo "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
+echo
+echo "Jika halaman tetap blank, cek file log-download.txt, log-extract.txt, dan log-install.txt untuk error."
+echo "Juga cek isi file /www/libernet/index.php, pastikan tidak kosong dan tidak ada error."
+echo "Jika perlu, restart web server atau perangkat Anda."
+echo
+
+exit 0
