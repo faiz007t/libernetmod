@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons + Directory Backup + Favicon)
+# Libernet Mod Installer with LuCI Integration (Navy Navbar, White Icons, Directory Backup, Favicon)
 
 set -e
 
@@ -94,7 +94,7 @@ echo -e "\n\033[1;34mApplying custom theme and favicon...\033[0m"
 # Create libernet directory if missing
 mkdir -p "$LIBERNET_DIR"
 
-# Download favicon to /www/favicon.ico (for all LuCI pages)
+# Download favicon to /www/favicon.ico (for all LuCI and web pages)
 wget -O /www/favicon.ico "$FAVICON_URL"
 
 # Write custom bootstrap.min.css
