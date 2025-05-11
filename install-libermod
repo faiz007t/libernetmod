@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icon)
+# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icons)
 
 set -e
 
@@ -117,7 +117,7 @@ body, .container, .container-fluid {
 .navbar, .navbar-default {
   background-color: #001f3f !important;
   border-color: #001f3f !important;
-  color: #000 !important;
+  color: #fff !important;
 }
 /* Make toggler/hamburger icon white */
 .navbar .navbar-toggler .navbar-toggler-icon,
@@ -127,6 +127,17 @@ body, .container, .container-fluid {
 }
 .icon-bar {
   background-color: #fff !important;
+}
+/* Make back icon in navbar white */
+.navbar .back-icon svg,
+.navbar .navbar-back svg,
+.navbar .navbar-back-icon svg {
+  fill: #fff !important;
+}
+.navbar .back-icon,
+.navbar .navbar-back,
+.navbar .navbar-back-icon {
+  color: #fff !important;
 }
 html {
   background: url("$REMOTE_BG") no-repeat center center fixed !important;
@@ -164,7 +175,7 @@ echo '<style>
   .navbar, .navbar-default {
     background-color: #001f3f !important;
     border-color: #001f3f !important;
-    color: #000 !important;
+    color: #fff !important;
   }
   /* Make toggler/hamburger icon white */
   .navbar .navbar-toggler .navbar-toggler-icon,
@@ -174,6 +185,17 @@ echo '<style>
   }
   .icon-bar {
     background-color: #fff !important;
+  }
+  /* Make back icon in navbar white */
+  .navbar .back-icon svg,
+  .navbar .navbar-back svg,
+  .navbar .navbar-back-icon svg {
+    fill: #fff !important;
+  }
+  .navbar .back-icon,
+  .navbar .navbar-back,
+  .navbar .navbar-back-icon {
+    color: #fff !important;
   }
 </style>';
 ?>
@@ -238,7 +260,7 @@ cat > "$LUCI_VIEW" <<EOF
     #luci-back svg {
       width: 28px;
       height: 28px;
-      fill: #000;
+      fill: #fff !important;
     }
     @media (max-width: 768px) {
       #luci-back {
@@ -259,7 +281,7 @@ cat > "$LUCI_VIEW" <<EOF
     .navbar, .navbar-default {
       background-color: #001f3f !important;
       border-color: #001f3f !important;
-      color: #000 !important;
+      color: #fff !important;
     }
     /* Make toggler/hamburger icon white */
     .navbar .navbar-toggler .navbar-toggler-icon,
@@ -269,6 +291,17 @@ cat > "$LUCI_VIEW" <<EOF
     }
     .icon-bar {
       background-color: #fff !important;
+    }
+    /* Make back icon in navbar white */
+    .navbar .back-icon svg,
+    .navbar .navbar-back svg,
+    .navbar .navbar-back-icon svg {
+      fill: #fff !important;
+    }
+    .navbar .back-icon,
+    .navbar .navbar-back,
+    .navbar .navbar-back-icon {
+      color: #fff !important;
     }
   </style>
 </head>
