@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with Custom Favicon and White Theme
+# Libernet Mod Installer with Custom Favicon, White Theme, and Result Box Styling
 
 set -e
 
@@ -169,11 +169,25 @@ cat > $LUCI_VIEW <<EOF
         height: 24px;
       }
     }
-    /* Navbar (inside iframe) style suggestion for developer:
-      .navbar, .navbar-box { background: #fff !important; }
-      .navbar-icon, .navbar-toggler-icon { color: #fff !important; background: #000 !important; }
-      .navbar-text { color: #000 !important; }
+    /* --- Libernet UI (iframe) style hints for developer --- */
+    /* Fixed white navbar and hamburger icon: */
+    /* .navbar, .navbar-box { background: #fff !important; }
+       .navbar-icon, .navbar-toggler-icon {
+         color: #fff !important; background: #000 !important;
+         /* For Bootstrap 4/5: */
+         /* background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"); */
+       }
+       .navbar-text { color: #000 !important; }
     */
+    /* Result box: */
+    .result-box, #result {
+      background: #fff !important;
+      color: #000 !important;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin: 16px 0;
+    }
   </style>
 </head>
 <body>
@@ -218,6 +232,8 @@ echo -e "Access Libernet Mod via:"
 echo -e "1. Web Interface: \033[4mhttp://\$(uci get network.lan.ipaddr)/libernet\033[0m"
 echo -e "2. LuCI Interface: Services Menu -> Libernet"
 echo -e "\nFavicon is now set for the Libernet LuCI page."
+echo -e "- Result box is white with black text."
+echo -e "- Navbar and hamburger icon are white (see CSS hints)."
 echo -e "- Clear your browser cache if you don't see the new icon."
 echo -e "- Check installation log at: install.log"
 echo -e "- Backup important configurations\n"
