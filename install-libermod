@@ -1,58 +1,103 @@
 #!/bin/bash
 
+# Libermod Installer by Hanif Widi Widodo - Improved Version
+
 clear
-echo -e "#############################################"
-echo -e "#  Libermod Installer by Hanif Widi Widodo  #"
-echo -e "#############################################"
-echo -e ""
+echo "#############################################"
+echo "#  Libermod Installer by Hanif Widi Widodo  #"
+echo "#############################################"
+echo
 sleep 1
-echo -e "*Sebelum install libermod pastikan sudah terinstall libernet sebelumnya*"
-echo -e ""
+echo "* Sebelum install libermod pastikan sudah terinstall libernet sebelumnya *"
+echo
 sleep 1
-echo -e "- REMOVE LOGIN PAGE"
-echo -e "- REMOVE SPEEDTEST PAGE"
-echo -e "- CHANGE THEME COLOR"
-echo -e "- CHANGE BACKGROUND IMAGE"
-echo -e "- ADD BACKGROUND MUSIC"
-echo -e "- FIX BENGONG (InshaAllah Aman)"
-echo -e ""
-sleep 3
-echo -e "Harap tunggu, libermod segera di install..."
-echo -e "#"
-sleep 1
-echo -e "##"
-sleep 1
-echo -e "###"
+echo "- REMOVE LOGIN PAGE"
+echo "- REMOVE SPEEDTEST PAGE"
+echo "- CHANGE THEME COLOR"
+echo "- CHANGE BACKGROUND IMAGE"
+echo "- ADD BACKGROUND MUSIC"
+echo "- FIX BENGONG (InshaAllah Aman)"
+echo
 sleep 2
-echo -e "Downloading file..."
+
+# Check for required commands
+for cmd in opkg wget unzip; do
+    if ! command -v $cmd &>/dev/null; then
+        echo "ERROR: Command '$cmd' not found! Please install it first."
+        exit 1
+    fi
+done
+
+echo "Harap tunggu, libermod segera di install..."
+sleep 1
+echo "#"
+sleep 1
+echo "##"
+sleep 1
+echo "###"
+sleep 1
+
+echo "Downloading file..."
 {
-opkg install unzip
-wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
-rm -r /www/libernet
+    opkg install unzip
+    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to download libernet.zip"
+        exit 1
+    fi
+    rm -rf /www/libernet
 } &> log-download.txt
-echo -e "Extacting file..."
+
+echo "Extracting file..."
 {
-unzip /www/libernet.zip -d /www
+    unzip -o /www/libernet.zip -d /www
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to unzip libernet.zip"
+        exit 1
+    fi
 } &> log-extract.txt
 sleep 2
-echo -e "Mod & Change Theme Color..."
+
+echo "Mod & Change Theme Color..."
 {
-wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
-wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
-wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
-wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
-wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
-wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
-wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
-wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
-wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
+    wget -O /www/libernet/system.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/system.php
+    wget -O /www/libernet/navbar.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/navbar.php
+    wget -O /www/libernet/index.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/index.php
+    wget -O /www/libernet/head.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/head.php
+    wget -O /www/libernet/footer.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/footer.php
+    wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/config.php
+    wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/hanifwidi17/libermod/main/about.php
+    wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+    wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+    wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
+    wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
-rm /www/libernet.zip
-rm install-libermod
-echo -e ""
-echo -e ""
-echo -e "PROSES PEMASANGAN LIBERMOD SELESAI!"
-echo -e "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
-echo -e ""
+
+# Set proper permissions
+chmod -R 755 /www/libernet
+
+# Clean up
+rm -f /www/libernet.zip
+rm -f install-libermod
+
+# PHP error reporting for debugging (optional)
+php_error_file="/www/libernet/index.php"
+if grep -q "<?php" "$php_error_file"; then
+    sed -i '1i\
+<?php\
+ini_set("display_errors", 1);\
+ini_set("display_startup_errors", 1);\
+error_reporting(E_ALL);\
+?>' "$php_error_file"
+fi
+
+echo
+echo "PROSES PEMASANGAN LIBERMOD SELESAI!"
+echo "SILAHKAN CLEAR CACHE BROWSER ANDA SEBELUM MENGAKSES LIBERNET"
+echo
+echo "Jika halaman tetap blank, cek file log-download.txt, log-extract.txt, dan log-install.txt untuk error."
+echo "Juga cek isi file /www/libernet/index.php, pastikan tidak kosong dan tidak ada error."
+echo "Jika perlu, restart web server atau perangkat Anda."
+echo
+
+exit 0
