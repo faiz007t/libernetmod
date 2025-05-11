@@ -1,5 +1,5 @@
 #!/bin/bash
-# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme)
+# Libernet Mod Installer with LuCI Integration (Navy Navbar Theme + White Icon)
 
 set -e
 
@@ -119,6 +119,15 @@ body, .container, .container-fluid {
   border-color: #001f3f !important;
   color: #000 !important;
 }
+/* Make toggler/hamburger icon white */
+.navbar .navbar-toggler .navbar-toggler-icon,
+.navbar-default .navbar-toggler .navbar-toggler-icon,
+.navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'><path stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+}
+.icon-bar {
+  background-color: #fff !important;
+}
 html {
   background: url("$REMOTE_BG") no-repeat center center fixed !important;
   background-size: cover !important;
@@ -156,6 +165,15 @@ echo '<style>
     background-color: #001f3f !important;
     border-color: #001f3f !important;
     color: #000 !important;
+  }
+  /* Make toggler/hamburger icon white */
+  .navbar .navbar-toggler .navbar-toggler-icon,
+  .navbar-default .navbar-toggler .navbar-toggler-icon,
+  .navbar .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;utf8,<svg viewBox=\'0 0 30 30\' xmlns=\'http://www.w3.org/2000/svg\'><path stroke=\'rgba(255,255,255,1)\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' d=\'M4 7h22M4 15h22M4 23h22\'/></svg>");
+  }
+  .icon-bar {
+    background-color: #fff !important;
   }
 </style>';
 ?>
@@ -242,6 +260,15 @@ cat > "$LUCI_VIEW" <<EOF
       background-color: #001f3f !important;
       border-color: #001f3f !important;
       color: #000 !important;
+    }
+    /* Make toggler/hamburger icon white */
+    .navbar .navbar-toggler .navbar-toggler-icon,
+    .navbar-default .navbar-toggler .navbar-toggler-icon,
+    .navbar .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'><path stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/></svg>");
+    }
+    .icon-bar {
+      background-color: #fff !important;
     }
   </style>
 </head>
