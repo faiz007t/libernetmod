@@ -1,3 +1,7 @@
+<?php
+    include('auth.php');
+    check_session();
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,61 +9,19 @@
         $title = "Home";
         include("head.php");
     ?>
-    <!-- Font Awesome CDN for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="icon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
-    <style>
-    body {
-        background-image: url('https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-attachment: fixed;
-        height: 100%;
-        min-height: 100vh;
-    }
-    html {
-        height: 100%;
-    }
-    #ping-icon {
-        position: relative;
-    }
-    .ping-heartbeat {
-        position: absolute;
-        left: 0; top: 0;
-        width: 1em; height: 1em;
-        border-radius: 50%;
-        background: #17a2b8;
-        opacity: 0.6;
-        z-index: -1;
-        animation: ping-anim 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-        display: none;
-    }
-    @keyframes ping-anim {
-        0% { transform: scale(1); opacity: 0.6; }
-        80% { transform: scale(2); opacity: 0; }
-        100% { transform: scale(2); opacity: 0; }
-    }
-    [v-cloak] { display: none; }
-    </style>
 </head>
 <body>
-<?php include('navbar.php'); ?>
-<div id="app" v-cloak>
-    <div class="container-fluid">
+<div id="app">
+    <?php include('navbar.php'); ?>
+    <div class="container">
         <div class="row py-2">
-            <div class="col-lg-8 col-md-9 mx-auto mt-3">
+            <div class="col-lg-8 col-md-12 mx-auto mt-3">
                 <div class="card">
                     <div class="card-header">
                         <div class="text-center">
-                            <h4><i class="fa fa-home"></i> Libernet Mod</h4>
+                            <h3><i class="fa fa-home"></i> Home</h3>
                         </div>
-                    </div>
-                    <div class="card-body">
                         <hr>
-                        <!-- VUE FORM -->
                         <form @submit.prevent="runLibernet">
                             <div class="form-group form-row my-auto">
                                 <div class="col-lg-4 col-md-4 form-row py-1">
@@ -89,6 +51,8 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                    <div class="card-body">
                         <div class="card-body py-0 px-0">
                             <div class="row">
                                 <div v-if="config.mode !== 5" class="col-lg-6 col-md-6 pb-lg-1">
@@ -131,37 +95,24 @@
                                         </label>
                                     </div>
                                 </div>
-                                <!-- STATUS ICON SECTION (VUE REACTIVE) -->
                                 <div class="col-lg-6 col-md-6">
-                                    <i :class="statusIconClass" style="margin-right: 4px;"></i>
-                                    <span class="text-primary">Status: </span>
-                                    <span :class="statusTextClass">{{ connectionText }}</span>
-                                    <span v-if="connection === 2" class="text-primary">{{ connectedTime }}</span>
+                                    <span>Status: </span><span :class="{ 'text-secondary': connection === 0, 'text-warning': connection === 1, 'text-success': connection === 2, 'text-info': connection === 3 }">{{ connectionText }}</span>
+                                    <span v-if="connection === 2" class="text-secondary">{{ connectedTime }}</span>
                                 </div>
-                                <!-- WAN Info Section (HTML + JS) -->
                                 <div class="col-lg-6 col-md-6">
-                                    <i class="fa fa-server"></i>
-                                    <span class="text-primary">IP: <span id="wan-ip">Loading...</span></span>
+                                    <span>WAN IP: {{ wan_ip }} {{ wan_country }}</span>
                                 </div>
-                                <!-- Ping Section -->
-                                <div class="col-lg-6 col-md-6 pb-lg-1 d-flex align-items-center">
-                                    <i class="fa fa-signal" id="ping-icon" style="margin-right: 6px; position: relative;">
-                                        <span class="ping-heartbeat" id="ping-heartbeat"></span>
-                                    </i>
-                                    <span class="text-primary">Ping: <span id="wan-ping">...</span> ms</span>
+                                <div class="col-lg-6 col-md-6 d-sm-block d-md-block d-lg-none">
+                                    <span>WAN ISP: {{ wan_isp }}</span>
                                 </div>
-                                <div class="col-lg-6 col-md-6 pb-lg-1">
-                                    <i class="fa fa-flag"></i>
-                                    <span class="text-primary">ISP: <span id="wan-net">Loading...</span> (<span id="wan-country">Loading...</span>)</span>
+                                <div v-if="connection === 2" class="col-lg-6 col-md-6">
+                                    <span>TX | RX: </span><span class="text-secondary">{{ total_data.tx }} | {{ total_data.rx }}</span>
                                 </div>
-                                <!-- End WAN Info Section -->
-                                <div class="col-12 mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-info" id="refresh-wan-btn">
-                                        <i class="fa fa-refresh"></i> Refresh Info
-                                    </button>
+                                <div class="col-lg-6 col-md-6 d-none d-lg-block d-xl-block">
+                                    <span>WAN ISP: {{ wan_isp }}</span>
                                 </div>
                                 <div class="col pt-2">
-                                    <pre ref="log" v-html="log" class="form-control text-left" style="height: auto; width: auto; font-size:80%; background-image-position: center; background-color: #444b8a "></pre>
+                                    <pre ref="log" v-html="log" class="form-control text-left" style="height: 15rem; background-color: #e9ecef"></pre>
                                 </div>
                             </div>
                         </div>
@@ -169,183 +120,10 @@
                 </div>
             </div>
         </div>
+        <?php include('footer.php'); ?>
     </div>
 </div>
-<?php include('footer.php'); ?>
 <?php include("javascript.php"); ?>
 <script src="js/index.js"></script>
-
-<!-- WAN Info JavaScript (Dual Provider, with fallback) and Ping -->
-<script>
-async function fetchWanInfo() {
-    const ipElem = document.getElementById('wan-ip');
-    const netElem = document.getElementById('wan-net');
-    const countryElem = document.getElementById('wan-country');
-    const btn = document.getElementById('refresh-wan-btn');
-    const setFields = (ip, isp, country) => {
-        ipElem.textContent = ip || 'Unavailable';
-        netElem.textContent = isp || 'Unavailable';
-        countryElem.textContent = country || 'Unavailable';
-    };
-    if (btn) btn.disabled = true;
-    setFields('Loading...', 'Loading...', 'Loading...');
-    try {
-        const resp1 = await fetch('http://ip-api.com/json/');
-        if (!resp1.ok) throw new Error('ip-api.com unavailable');
-        const data1 = await resp1.json();
-        if (data1.status === 'success') {
-            setFields(data1.query, data1.isp, data1.country);
-            if (btn) btn.disabled = false;
-            return;
-        }
-    } catch (e) {}
-    try {
-        const resp2 = await fetch('https://api.ipapi.is/?q=');
-        if (!resp2.ok) throw new Error('ipapi.is unavailable');
-        const data2 = await resp2.json();
-        setFields(
-            data2.ip,
-            data2.company && data2.company.name ? data2.company.name : 'Unavailable',
-            data2.location && data2.location.country ? data2.location.country : 'Unavailable'
-        );
-    } catch (e) {
-        setFields('Unavailable', 'Unavailable', 'Unavailable');
-    } finally {
-        if (btn) btn.disabled = false;
-    }
-}
-
-// Browser-based "ping" using image load time
-let pingTimeoutCount = 0;
-function showPingHeartbeat(active) {
-    const heartbeat = document.getElementById('ping-heartbeat');
-    if (heartbeat) heartbeat.style.display = active ? 'block' : 'none';
-}
-function updatePing() {
-    var pingElem = document.getElementById('wan-ping');
-    showPingHeartbeat(true);
-    pingElem.textContent = "...";
-    var start = Date.now();
-    var img = new window.Image();
-    var finished = false;
-    img.onload = img.onerror = function() {
-        if (finished) return;
-        finished = true;
-        showPingHeartbeat(false);
-        var latency = Date.now() - start;
-        if (latency < 5000) {
-            pingTimeoutCount = 0;
-            pingElem.textContent = latency;
-        } else {
-            pingTimeoutCount++;
-            pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
-        }
-    };
-    img.src = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png?cachebust=" + Math.random();
-    setTimeout(function() {
-        if (!finished) {
-            finished = true;
-            showPingHeartbeat(false);
-            pingTimeoutCount++;
-            pingElem.textContent = pingTimeoutCount > 3 ? "Unavailable" : "Timeout";
-        }
-    }, 5000);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    fetchWanInfo();
-    updatePing();
-    var btn = document.getElementById('refresh-wan-btn');
-    if (btn) btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        fetchWanInfo();
-        updatePing();
-    });
-    setInterval(fetchWanInfo, 180000); // Refresh IP and ISP every 3 minutes
-    setInterval(updatePing, 5000);     // Refresh ping every 5 seconds
-});
-</script>
-
-<!-- Vue instance -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-<script>
-new Vue({
-    el: '#app',
-    data: {
-        config: {
-            mode: 0,
-            profile: '',
-            temp: { modes: [] },
-            profiles: [],
-            system: {
-                tun2socks: { legacy: false },
-                tunnel: { autostart: false, dns_resolver: false, ping_loop: false },
-                system: { memory_cleaner: false }
-            }
-        },
-        status: false,
-        statusText: 'Start',
-        connection: 0, // 0=Disconnected, 1=Connecting, 2=Connected, 3=Info
-        connectionText: 'Disconnected',
-        connectedTime: '',
-        log: '',
-    },
-    computed: {
-        sortedModes() {
-            // You can sort modes here if needed
-            return this.config.temp.modes;
-        },
-        statusIconClass() {
-            switch (this.connection) {
-                case 0: return 'fa fa-circle text-primary';
-                case 1: return 'fa fa-exclamation-circle text-warning';
-                case 2: return 'fa fa-check-circle text-success';
-                case 3: return 'fa fa-info-circle text-info';
-                default: return 'fa fa-circle text-secondary';
-            }
-        },
-        statusTextClass() {
-            switch (this.connection) {
-                case 0: return 'text-primary';
-                case 1: return 'text-warning';
-                case 2: return 'text-success';
-                case 3: return 'text-info';
-                default: return 'text-secondary';
-            }
-        }
-    },
-    methods: {
-        runLibernet() {
-            // Your logic to start/stop Libernet
-            // Update status, connection, connectionText, connectedTime as needed
-            // Example:
-            this.status = !this.status;
-            if (this.status) {
-                this.connection = 1;
-                this.connectionText = 'Connecting';
-                setTimeout(() => {
-                    this.connection = 2;
-                    this.connectionText = 'Connected';
-                    this.connectedTime = new Date().toLocaleTimeString();
-                }, 2000);
-            } else {
-                this.connection = 0;
-                this.connectionText = 'Disconnected';
-                this.connectedTime = '';
-            }
-        }
-    },
-    mounted() {
-        // Example: set up initial modes and profiles
-        this.config.temp.modes = [
-            { value: 0, name: 'Mode 0' },
-            { value: 1, name: 'Mode 1' },
-            { value: 2, name: 'Mode 2' }
-        ];
-        this.config.profiles = ['Default', 'Profile 1', 'Profile 2'];
-        this.config.profile = this.config.profiles[0];
-    }
-});
-</script>
 </body>
 </html>
