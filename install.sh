@@ -1,58 +1,43 @@
 #!/bin/sh
 
 # Libernet Installer (faiz007t/libernetmod)
-# Robust installation with architecture validation and duplicate checking
+# Downloads all files directly from REPO_URL root/subfolders (no $BRANCH, no $ARCH)
 
 REPO_URL="https://github.com/faiz007t/libernetmod"
-PROP_URL="https://github.com/faiz007t/libernet-proprietary/raw/main"
-BRANCH="main"
 TMP_DIR=$(mktemp -d)
 INSTALL_DIR="/root/libernet"
 WWW_DIR="/www/libernet"
 
-# Cleanup handler
 cleanup() {
   rm -rf "$TMP_DIR"
   exit
 }
 trap cleanup EXIT INT TERM
 
-# Root verification
 [ "$(id -u)" != "0" ] && { echo "ERROR: Run as root" >&2; exit 1; }
 
-# Architecture detection
-ARCH=$(grep -o "DISTRIB_ARCH='[^']*'" /etc/openwrt_release | cut -d"'" -f2)
-[ -z "$ARCH" ] && { echo "ERROR: Architecture detection failed"; exit 1; }
-
-# File downloader with validation
 download_file() {
   echo "Downloading $1..."
-  if ! curl -fsSL -o "$TMP_DIR/$1" "$REPO_URL/raw/$BRANCH/$1"; then
+  if ! curl -fsSL -o "$TMP_DIR/$1" "$REPO_URL/raw/main/$1"; then
     echo "ERROR: Failed to download $1" >&2
     exit 1
   fi
 }
 
-# Directory downloader
 download_dir() {
   mkdir -p "$TMP_DIR/$1"
-  curl -sSL "$REPO_URL/tree/$BRANCH/$1" | 
-    grep -Eo 'href="[^"]+"' | 
-    awk -F'"' '{print $2}' |
-    while read -r item; do
-      case $item in
-        */$1/*) 
-          fname="${item##*/}"
-          [ -n "$fname" ] && download_file "$1/$fname"
-          ;;
-      esac
+  curl -sSL "https://api.github.com/repos/faiz007t/libernetmod/contents/$1" | \
+    grep '"download_url":' | \
+    cut -d '"' -f4 | \
+    while read -r url; do
+      fname="$TMP_DIR/$1/$(basename "$url")"
+      curl -fsSL -o "$fname" "$url"
     done
 }
 
-# Main installation process
 {
   echo "=== Initializing Installation ==="
-  
+
   # Download core components
   echo "- Downloading base files..."
   for file in requirements.txt binaries.txt packages.txt update.sh; do
@@ -71,8 +56,8 @@ download_dir() {
     [ -n "$pkg" ] && opkg list-installed | grep -q "^$pkg " || opkg install "$pkg"
   done < "$TMP_DIR/requirements.txt"
 
-  # Proprietary binaries
-  echo "=== Installing Proprietary Binaries ==="
+  # Binaries
+  echo "=== Installing Binaries ==="
   while IFS= read -r bin; do
     [ -z "$bin" ] && continue
     if command -v "$bin" >/dev/null 2>&1; then
@@ -80,15 +65,15 @@ download_dir() {
       continue
     fi
     echo "Installing $bin..."
-    curl -fsSL -o "/usr/bin/$bin" "$PROP_URL/$ARCH/binaries/$bin" || {
-      echo "ERROR: Failed to download $bin for $ARCH"
+    curl -fsSL -o "/usr/bin/$bin" "$REPO_URL/raw/main/binaries/$bin" || {
+      echo "ERROR: Failed to download $bin"
       exit 1
     }
     chmod 755 "/usr/bin/$bin"
   done < "$TMP_DIR/binaries.txt"
 
-  # Proprietary packages
-  echo "=== Installing Proprietary Packages ==="
+  # Packages
+  echo "=== Installing Packages ==="
   while IFS= read -r pkg; do
     [ -z "$pkg" ] && continue
     if opkg list-installed | grep -q "^$pkg "; then
@@ -97,7 +82,7 @@ download_dir() {
     fi
     tmp_pkg="/tmp/${pkg}.ipk"
     echo "Installing $pkg..."
-    curl -fsSL -o "$tmp_pkg" "$PROP_URL/$ARCH/packages/$pkg.ipk" || {
+    curl -fsSL -o "$tmp_pkg" "$REPO_URL/raw/main/packages/$pkg.ipk" || {
       echo "ERROR: Failed to download $pkg.ipk"
       exit 1
     }
@@ -146,7 +131,7 @@ EOF
   fi
 
   # Final output
-  ip=$(ubus call network.interface.lan status 2>/dev/null | 
+  ip=$(ubus call network.interface.lan status 2>/dev/null | \
        sed -n 's/.*"address":"\([^"]*\)".*/\1/p')
   [ -z "$ip" ] && ip="192.168.1.1"
   echo "========================================"
