@@ -1,5 +1,5 @@
 <footer class="text-center">
-    <span style="color: grey;">
+    <span style="color: gray;">
     © 2025 
     <a href="https://github.com/faiz007t/libernetmod" rel="noopener noreferrer">
       Libernet Mod
