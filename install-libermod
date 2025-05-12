@@ -10,19 +10,11 @@ echo -e "#       Libernet Mod v1.5.4 Installer Pro       #"
 echo -e "#################################################\n"
 sleep 2
 echo -e ""
-
 # ---------------------------
 # Dependency Check
 # ---------------------------
 check_dep() {
-    if ! command -v "$1" >/dev/null 2>&1; then
-        if ! command -v opkg >/dev/null 2>&1; then
-            echo "Error: opkg not found. Cannot install $1. Aborting."
-            exit 1
-        fi
-        echo "Installing missing dependency: $1"
-        opkg update && opkg install "$1" || { echo "Failed to install $1"; exit 1; }
-    fi
+    command -v "$1" >/dev/null 2>&1 || { opkg update && opkg install "$1"; }
 }
 check_dep unzip
 check_dep wget
@@ -55,7 +47,7 @@ echo -e "Mod & Change Theme Color..."
     wget -O /www/libernet/config.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/config.php
     wget -O /www/libernet/about.php --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/about.php
     wget -O /www/libernet/img/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
-    wget -O /www/libernet/assets/img/backgrounds/re.jpg --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
+    wget -O /www/libernet/assets/img/backgrounds/re.img --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg
     wget -O /www/libernet/lib/vendor/bootstrap/css/bootstrap.min.css --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/bootstrap.min.css
     wget -O /root/libernet/bin/ping-loop.sh --no-check-certificate https://raw.githubusercontent.com/faiz007t/libernetmod/main/ping-loop.sh
 } &> log-install.txt
@@ -174,10 +166,9 @@ rm -f "$0"
 # ---------------------------
 # Completion Message
 # ---------------------------
-LAN_IP=$(uci get network.lan.ipaddr 2>/dev/null || echo "your-router-ip")
 echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
 echo -e "Access Libernet Mod via:"
-echo -e "1. Web Interface: \033[4mhttp://$LAN_IP/libernet\033[0m"
+echo -e "1. Web Interface: \033[4mhttp://$(uci get network.lan.ipaddr)/libernet\033[0m"
 echo -e "2. LuCI Interface: Services Menu -> Libernet"
 echo -e "\nDon't forget to:"
 echo -e "- Clear your browser cache"
