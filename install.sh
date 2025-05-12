@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Libernet Robust Installer with Auto Login Bypass
-# Removes login page for direct dashboard access
+# Libernet Installer with Auto-Login (No Login Page)
+# Installs Libernet, fixes package conflicts, ensures config.json, and disables login
 
 set -eo pipefail
 
@@ -23,10 +23,8 @@ handle_package_conflicts() {
         opkg remove libnl-tiny
     fi
     if opkg list-installed | grep -q '^dnsmasq '; then
-        echo "Adjusting for dnsmasq installation..."
         sed -i '/^dnsmasq-full/d' "${LIBERNET_TMP}/requirements.txt"
     elif opkg list-installed | grep -q '^dnsmasq-full '; then
-        echo "Adjusting for dnsmasq-full installation..."
         sed -i '/^dnsmasq/d' "${LIBERNET_TMP}/requirements.txt"
     fi
 }
@@ -139,16 +137,27 @@ configure_libernet_firewall() {
     fi
 }
 
-remove_login_page() {
-    echo "=== Removing Login Page ==="
-    if [ -f "${LIBERNET_WWW}/login.php" ]; then
-        rm -f "${LIBERNET_WWW}/login.php"
-        echo "login.php removed."
+auto_login_patch() {
+    echo "=== Patching Web Files for Auto-Login ==="
+    # Remove login page
+    [ -f "${LIBERNET_WWW}/login.php" ] && rm -f "${LIBERNET_WWW}/login.php"
+    # Patch auth.php to always log in as admin
+    cat > "${LIBERNET_WWW}/auth.php" <<'EOF'
+<?php
+session_start();
+$_SESSION['username'] = "admin";
+$_SESSION['password'] = "libernet";
+?>
+EOF
+    # Remove or comment out any redirect to login.php in index.php
+    if grep -q "login.php" "${LIBERNET_WWW}/index.php"; then
+        sed -i '/login.php/s/^/\/\/ /' "${LIBERNET_WWW}/index.php"
     fi
-    # Optionally, redirect index.php to dashboard if needed
-    # If you know the dashboard file, you can symlink or copy it as index.php
-    # For example, if dashboard is dashboard.php:
-    # cp -f "${LIBERNET_WWW}/dashboard.php" "${LIBERNET_WWW}/index.php"
+    # Optionally, ensure index.php or dashboard.php is default
+    # If dashboard.php exists, set as index.php
+    if [ -f "${LIBERNET_WWW}/dashboard.php" ]; then
+        cp -f "${LIBERNET_WWW}/dashboard.php" "${LIBERNET_WWW}/index.php"
+    fi
 }
 
 finish_install() {
@@ -196,11 +205,10 @@ main_installation() {
 
     setup_environment
     configure_libernet_firewall
-    remove_login_page
+    auto_login_patch
     finish_install
 }
 
-# ---- Execution ----
 if [ "$(id -u)" != "0" ]; then
     echo "This script must be run as root" >&2
     exit 1
