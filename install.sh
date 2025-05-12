@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Libernet Hybrid Installer (with conflict and config.json fix)
+# Libernet Hybrid Installer (with config.json fix)
 # Installs from faiz007t/libernetmod, auto-fixes missing dirs/files from lutfailham96/libernet
-# Handles ip-full/libnl-tiny conflicts, ensures system/config.json, BusyBox tar compatible
+# Ensures system/config.json exists and LIBERNET_DIR is set for PHP
 
 set -eo pipefail
 
@@ -69,28 +69,6 @@ verify_and_fetch() {
   # If config.json is still missing, create a default one
   if [ ! -f "system/config.json" ]; then
     echo '{}' > system/config.json
-  fi
-}
-
-resolve_opkg_conflicts() {
-  # Handle dnsmasq/dnsmasq-full conflict in requirements.txt
-  if opkg list-installed | grep -q '^dnsmasq '; then
-    sed -i '/^dnsmasq-full/d' requirements.txt
-  elif opkg list-installed | grep -q '^dnsmasq-full '; then
-    sed -i '/^dnsmasq/d' requirements.txt
-  fi
-
-  # Handle ip-full/libnl-tiny conflict
-  if grep -q '^ip-full$' requirements.txt; then
-    if opkg list-installed | grep -q '^libnl-tiny '; then
-      echo "Removing conflicting libnl-tiny package..."
-      opkg remove libnl-tiny || true
-    fi
-    echo "Installing ip-full (with --force-overwrite)..."
-    opkg update
-    opkg install --force-overwrite ip-full || true
-    # Remove ip-full from requirements.txt so it doesn't get reinstalled
-    sed -i '/^ip-full$/d' requirements.txt
   fi
 }
 
@@ -161,6 +139,7 @@ set_libernet_env() {
 }
 
 fix_permissions() {
+  # Make sure www-data (or httpd user) can read config.json and system dir
   chown -R root:root "${LIBERNET_DIR}/system"
   chmod 755 "${LIBERNET_DIR}/system"
   chmod 644 "${LIBERNET_DIR}/system/config.json"
@@ -187,13 +166,12 @@ finish_install() {
 
 main_installer() {
   opkg update
-  verify_and_fetch
-  resolve_opkg_conflicts
   install_packages
   install_proprietary_binaries
   install_proprietary_packages
 
   echo "Installing Libernet..."
+  verify_and_fetch
   mkdir -p "${LIBERNET_DIR}" "${LIBERNET_WWW}"
   
   cp -af update.sh "${LIBERNET_DIR}/"
