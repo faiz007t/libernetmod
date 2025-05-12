@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# Libernet Installer with Auto-Login (No Login Page)
-# Installs Libernet, fixes package conflicts, ensures config.json, and disables login
+# Libernet Installer with Full Authentication Removal
+# Removes all login checks and ensures direct dashboard access
 
 set -eo pipefail
 
+# ---- Configuration ----
 HOME="/root"
 ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
 LIBERNET_DIR="${HOME}/libernet"
@@ -16,6 +17,7 @@ MOD_REPO="https://github.com/faiz007t/libernetmod"
 REQUIRED_DIRS=("bin" "web" "system" "log")
 REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt" "system/config.json")
 
+# ---- Core Functions ----
 handle_package_conflicts() {
     echo "=== Resolving Package Conflicts ==="
     if opkg list-installed | grep -q '^libnl-tiny '; then
@@ -137,27 +139,21 @@ configure_libernet_firewall() {
     fi
 }
 
-auto_login_patch() {
-    echo "=== Patching Web Files for Auto-Login ==="
-    # Remove login page
-    [ -f "${LIBERNET_WWW}/login.php" ] && rm -f "${LIBERNET_WWW}/login.php"
-    # Patch auth.php to always log in as admin
-    cat > "${LIBERNET_WWW}/auth.php" <<'EOF'
-<?php
-session_start();
-$_SESSION['username'] = "admin";
-$_SESSION['password'] = "libernet";
-?>
-EOF
-    # Remove or comment out any redirect to login.php in index.php
-    if grep -q "login.php" "${LIBERNET_WWW}/index.php"; then
-        sed -i '/login.php/s/^/\/\/ /' "${LIBERNET_WWW}/index.php"
-    fi
-    # Optionally, ensure index.php or dashboard.php is default
-    # If dashboard.php exists, set as index.php
-    if [ -f "${LIBERNET_WWW}/dashboard.php" ]; then
-        cp -f "${LIBERNET_WWW}/dashboard.php" "${LIBERNET_WWW}/index.php"
-    fi
+remove_auth_checks() {
+    echo "=== Removing Authentication System ==="
+    # Remove login-related files
+    rm -f "${LIBERNET_WWW}/login.php" "${LIBERNET_WWW}/auth.php"
+
+    # Clean authentication checks from all PHP files
+    find "${LIBERNET_WWW}" -type f -name "*.php" -exec sed -i \
+        -e '/\s*include\s*(\s*'\''auth.php'\''\s*)\s*;/d' \
+        -e '/\s*check_session\s*(\s*)\s*;/d' \
+        -e '/\s*header\s*(\s*"Location:\s*login.php"\s*)\s*;/d' \
+        {} \;
+
+    # Set dashboard as default page
+    [ -f "${LIBERNET_WWW}/dashboard.php" ] && \
+        ln -sf "dashboard.php" "${LIBERNET_WWW}/index.php"
 }
 
 finish_install() {
@@ -170,8 +166,6 @@ finish_install() {
     echo "========================================"
     echo " Libernet Installation Complete!"
     echo " Access: http://${router_ip}/libernet"
-    echo " Username: admin"
-    echo " Password: libernet"
     echo " Installed: $(date +'%Y-%m-%d %H:%M:%S')"
     echo "========================================"
 }
@@ -205,7 +199,7 @@ main_installation() {
 
     setup_environment
     configure_libernet_firewall
-    auto_login_patch
+    remove_auth_checks
     finish_install
 }
 
