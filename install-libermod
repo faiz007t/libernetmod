@@ -25,7 +25,7 @@ check_dep wget
 # ---------------------------
 echo -e "Downloading file..."
 {
-    wget -O /www/libernet.zip --no-check-certificate https://github.com/hanifwidi17/libermod/raw/main/libernet.zip
+    wget -O /www/libernet.zip --no-check-certificate https://github.com/faiz007t/libernetmod/raw/main/libernet.zip
     rm -rf /www/libernet
 } &> log-download.txt
 
