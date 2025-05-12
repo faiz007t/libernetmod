@@ -18,7 +18,9 @@ REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt" "sy
 
 handle_package_conflicts() {
     echo "=== Resolving Package Conflicts ==="
-    # Remove standard dnsmasq if present to avoid conflict with dnsmasq-full
+    # Remove dnsmasq from requirements.txt if present
+    sed -i '/^dnsmasq$/d' "${LIBERNET_TMP}/requirements.txt"
+    # Remove dnsmasq if installed
     if opkg list-installed | grep -q '^dnsmasq '; then
         echo "Removing dnsmasq to prevent conflicts with dnsmasq-full..."
         opkg remove --force-removal-of-dependent-packages dnsmasq
@@ -68,6 +70,10 @@ install_dependencies() {
     opkg update
     while IFS= read -r pkg; do
         [ -z "$pkg" ] || [[ "$pkg" == "#"* ]] && continue
+        if [[ "$pkg" == "dnsmasq" ]]; then
+            echo "Skipping dnsmasq installation (conflict with dnsmasq-full)"
+            continue
+        fi
         if ! opkg list-installed | grep -q "^${pkg} "; then
             echo "Installing ${pkg}..."
             if [ "$pkg" == "ip-full" ]; then
