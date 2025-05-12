@@ -14,7 +14,7 @@ ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed
 LIBERNET_DIR="${HOME}/libernet"
 LIBERNET_WWW="/www/libernet"
 STATUS_LOG="${LIBERNET_DIR}/log/status.log"
-DOWNLOADS_DIR="${HOME}/Downloads"
+DOWNLOADS_DIR="${HOME}/downloads"
 LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
 REPOSITORY_URL="https://github.com/faiz007t/libernetmod"
 
