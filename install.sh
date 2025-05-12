@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Libernet Robust Installer
-# Resolves package conflicts, auto-fixes missing components, and ensures proper permissions
+# Libernet Robust Installer with Auto Login Bypass
+# Removes login page for direct dashboard access
 
 set -eo pipefail
 
-# ---- Configuration ----
 HOME="/root"
 ARCH="$(grep 'DISTRIB_ARCH' /etc/openwrt_release | awk -F '=' '{print $2}' | sed "s/'//g")"
 LIBERNET_DIR="${HOME}/libernet"
@@ -17,15 +16,12 @@ MOD_REPO="https://github.com/faiz007t/libernetmod"
 REQUIRED_DIRS=("bin" "web" "system" "log")
 REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt" "system/config.json")
 
-# ---- Core Functions ----
 handle_package_conflicts() {
     echo "=== Resolving Package Conflicts ==="
-    # Handle libnl-tiny conflict for ip-full
     if opkg list-installed | grep -q '^libnl-tiny '; then
         echo "Removing conflicting libnl-tiny..."
         opkg remove libnl-tiny
     fi
-    # Handle dnsmasq/dnsmasq-full conflict
     if opkg list-installed | grep -q '^dnsmasq '; then
         echo "Adjusting for dnsmasq installation..."
         sed -i '/^dnsmasq-full/d' "${LIBERNET_TMP}/requirements.txt"
@@ -62,7 +58,6 @@ verify_structure() {
             curl -sL "${REPOSITORY_URL}/raw/main/${file}" -o "${LIBERNET_TMP}/${file}"
         fi
     done
-    # Create default config if missing
     if [ ! -f "${LIBERNET_TMP}/system/config.json" ]; then
         echo "Initializing default configuration"
         echo '{"servers":[],"settings":{}}' > "${LIBERNET_TMP}/system/config.json"
@@ -144,6 +139,18 @@ configure_libernet_firewall() {
     fi
 }
 
+remove_login_page() {
+    echo "=== Removing Login Page ==="
+    if [ -f "${LIBERNET_WWW}/login.php" ]; then
+        rm -f "${LIBERNET_WWW}/login.php"
+        echo "login.php removed."
+    fi
+    # Optionally, redirect index.php to dashboard if needed
+    # If you know the dashboard file, you can symlink or copy it as index.php
+    # For example, if dashboard is dashboard.php:
+    # cp -f "${LIBERNET_WWW}/dashboard.php" "${LIBERNET_WWW}/index.php"
+}
+
 finish_install() {
     if command -v ip >/dev/null 2>&1; then
         router_ip=$(ip -4 addr show br-lan | awk '/inet / {print $2}' | cut -d/ -f1)
@@ -189,6 +196,7 @@ main_installation() {
 
     setup_environment
     configure_libernet_firewall
+    remove_login_page
     finish_install
 }
 
