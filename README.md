@@ -52,7 +52,3 @@ opkg update && opkg install bash curl && wget -O install.sh https://raw.githubus
 ```sh
 opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernetmod/main/install-libermod -q && sed -i 's/\r$//' install-libermod && bash install-libermod
 ```
-```sh
-opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernetmod/main/install-libermod && chmod +x install-libermod && ./install-libermod
-```
-
