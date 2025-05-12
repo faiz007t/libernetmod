@@ -33,7 +33,7 @@ Libernet is open source web app for tunneling internet using SSH, V2Ray, Trojan,
 - Shadowsocks
 - OpenVPN
 
-# Logs Updates & Remove
+## Updates & Remove
 <li> Add Libernet Page</li>
 <li> Add Ping</li>
 <li> Add Button Refresh Info</li>
