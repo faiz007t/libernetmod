@@ -9,6 +9,7 @@ echo -e "#################################################"
 echo -e "#       Libernet Mod v1.5.4 Installer Pro       #"
 echo -e "#################################################\n"
 sleep 2
+echo -e ""
 
 # ---------------------------
 # Dependency Check
@@ -65,21 +66,21 @@ echo -e "Mod & Change Theme Color..."
 echo -e "Improving theme and favicon settings..."
 
 THEME_NAME="libernet-mod"
-ICON_COLOR="#00bcd4"
+ICON_COLOR="#00bcd4" # Cyan (change this to any color you want)
 BG_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/re.jpg"
 FAVICON_URL="https://raw.githubusercontent.com/faiz007t/libernetmod/main/icon.ico"
 LUCI_THEME_DIR="/www/static/$THEME_NAME"
 LUCI_CONTROLLER="/usr/lib/lua/luci/controller/libernet.lua"
 LUCI_VIEW="/usr/lib/lua/luci/view/libernet-view.htm"
 
-# Clean theme directory
+# Clean up previous theme directory to avoid conflicts and loops
 rm -rf "$LUCI_THEME_DIR"
 mkdir -p "$LUCI_THEME_DIR/styles"
 
-# Install favicon
+# Download and install favicon for all pages
 wget -O "/www/favicon.ico" "$FAVICON_URL"
 
-# Create CSS with forced white toggler icon
+# Create theme CSS with improved result box styling, white navbar toggler, and unified icon color
 cat > "$LUCI_THEME_DIR/styles/libernet.css" <<EOF
 body {
     background: url('$BG_URL') no-repeat center center fixed;
@@ -89,6 +90,7 @@ body {
     background: rgba(255,255,255,0.9) !important;
     backdrop-filter: blur(5px);
 }
+/* Result/Log box: support all common selectors */
 .result-box,
 #result,
 pre.result-box,
@@ -106,25 +108,28 @@ pre[ref="log"] {
     background: rgba(0,31,63,0.9) !important;
     backdrop-filter: blur(5px);
 }
-/* Force white toggler icon */
+/* Make Bootstrap navbar toggler icon (hamburger) white */
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 .navbar-toggler {
-    border-color: #fff !important;
+    border-color: #fff;
 }
-.icon-cyan, .icon-cyan i { 
+/* Unified icon color for Font Awesome and emoji */
+.icon-cyan, .icon-cyan i, .icon-cyan .fa, .icon-cyan .fas, .icon-cyan .far, .icon-cyan .fab, .icon-cyan .fa-solid, .icon-cyan .fa-regular, .icon-cyan .fa-brands, .icon-cyan span.emoji {
     color: $ICON_COLOR !important;
 }
 EOF
 
-# Update head.php
+# Update head.php to reference the CSS correctly
 cat > /www/libernet/head.php <<EOF
 <?php
 echo '<link rel="icon" type="image/x-icon" href="/favicon.ico">';
 echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">';
 echo '<link rel="stylesheet" href="/static/libernet-mod/styles/libernet.css">';
-echo '<style>body { min-height: 100vh !important; }</style>';
+echo '<style>
+body { min-height: 100vh !important; }
+</style>';
 ?>
 EOF
 
@@ -150,23 +155,31 @@ cat > "$LUCI_VIEW" <<EOF
 EOF
 
 # ---------------------------
-# Final Steps
+# Final Configuration
 # ---------------------------
-echo -e "\nSetting permissions..."
-chmod 644 "$LUCI_CONTROLLER" "$LUCI_VIEW"
+echo -e "\nSetting file permissions..."
+chmod 644 "$LUCI_CONTROLLER"
+chmod 644 "$LUCI_VIEW"
 
-echo -e "Restarting web service..."
+echo -e "\nRestarting web service..."
 /etc/init.d/uhttpd restart
 
-echo -e "Cleaning up..."
-rm -f /www/libernet.zip "$0"
+# ---------------------------
+# Cleanup
+# ---------------------------
+echo -e "\nCleaning up installation files..."
+rm -f /www/libernet.zip
+rm -f "$0"
 
 # ---------------------------
-# Success Message
+# Completion Message
 # ---------------------------
 LAN_IP=$(uci get network.lan.ipaddr 2>/dev/null || echo "your-router-ip")
 echo -e "\n\033[1;32mINSTALLATION SUCCESSFUL!\033[0m"
-echo -e "Access via:"
+echo -e "Access Libernet Mod via:"
 echo -e "1. Web Interface: \033[4mhttp://$LAN_IP/libernet\033[0m"
-echo -e "2. LuCI: Services -> Libernet"
-echo -e "\n\033[1;33mClear browser cache if changes aren't visible!\033[0m"
+echo -e "2. LuCI Interface: Services Menu -> Libernet"
+echo -e "\nDon't forget to:"
+echo -e "- Clear your browser cache"
+echo -e "- Check installation log at: install.log"
+echo -e "- Backup important configurations\n"
