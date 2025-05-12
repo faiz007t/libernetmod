@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Libernet Installer with Full Authentication Removal
-# Removes all login checks and ensures direct dashboard access
+# Libernet Installer with Full Authentication Removal and Friendly Completion Message
 
 set -eo pipefail
 
@@ -146,9 +145,9 @@ remove_auth_checks() {
 
     # Clean authentication checks from all PHP files
     find "${LIBERNET_WWW}" -type f -name "*.php" -exec sed -i \
-        -e '/\s*include\s*(\s*'\''auth.php'\''\s*)\s*;/d' \
-        -e '/\s*check_session\s*(\s*)\s*;/d' \
-        -e '/\s*header\s*(\s*"Location:\s*login.php"\s*)\s*;/d' \
+        -e '/include[[:space:]]*(.\{0,1\}auth.php.\{0,1\});/d' \
+        -e '/check_session[[:space:]]*(.*);/d' \
+        -e '/header[[:space:]]*(.*login.php.*);/d' \
         {} \;
 
     # Set dashboard as default page
@@ -166,6 +165,8 @@ finish_install() {
     echo "========================================"
     echo " Libernet Installation Complete!"
     echo " Access: http://${router_ip}/libernet"
+    echo " Username: admin"
+    echo " Password: libernet"
     echo " Installed: $(date +'%Y-%m-%d %H:%M:%S')"
     echo "========================================"
 }
