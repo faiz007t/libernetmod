@@ -18,14 +18,16 @@ REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt" "sy
 
 handle_package_conflicts() {
     echo "=== Resolving Package Conflicts ==="
+    # Remove standard dnsmasq if present to avoid conflict with dnsmasq-full
+    if opkg list-installed | grep -q '^dnsmasq '; then
+        echo "Removing dnsmasq to prevent conflicts with dnsmasq-full..."
+        opkg remove dnsmasq
+    fi
+    # Do NOT add or remove dnsmasq-full in requirements.txt; user handles it
+    # Remove libnl-tiny if present
     if opkg list-installed | grep -q '^libnl-tiny '; then
         echo "Removing conflicting libnl-tiny..."
         opkg remove libnl-tiny
-    fi
-    if opkg list-installed | grep -q '^dnsmasq '; then
-        sed -i '/^dnsmasq-full/d' "${LIBERNET_TMP}/requirements.txt"
-    elif opkg list-installed | grep -q '^dnsmasq-full '; then
-        sed -i '/^dnsmasq/d' "${LIBERNET_TMP}/requirements.txt"
     fi
 }
 
