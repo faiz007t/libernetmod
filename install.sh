@@ -1,8 +1,6 @@
 #!/bin/bash
-
-# Libernet Hybrid Installer
-# Combines faiz007t/libernetmod with original libernet
-# v1.2.0-stable
+# Libernet Installer (BusyBox Compatible)
+# v1.3.2-busybox
 
 set -eo pipefail
 
@@ -15,34 +13,60 @@ LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
 MOD_REPO="https://github.com/faiz007t/libernetmod"
 ORIGINAL_REPO="https://github.com/lutfailham96/libernet"
 REQUIRED_DIRS=("bin" "web" "system" "log")
+REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt")
 
 # ---- Core Functions ----
 init_environment() {
-  # Create required directories
   mkdir -p "${DOWNLOADS_DIR}" "${LIBERNET_DIR}" "${LIBERNET_WWW}"
 }
 
-verify_repo_structure() {
-  echo "Verifying repository structure..."
-  for dir in "${REQUIRED_DIRS[@]}"; do
-    if [ ! -d "${LIBERNET_TMP}/${dir}" ]; then
-      echo "Downloading missing ${dir} from original repo..."
-      curl -sL "${ORIGINAL_REPO}/archive/main.tar.gz" | \
-        tar -xz -C "${LIBERNET_TMP}" --strip-components=1 "libernet-main/${dir}"
+fetch_from_repo() {
+  local path=$1
+  local target=$2
+  for repo in "$MOD_REPO" "$ORIGINAL_REPO"; do
+    raw_url="${repo/https:\/\/github.com/}/raw.githubusercontent.com"
+    raw_url="${raw_url}/main/${path}"
+    if curl -sfL "$raw_url" -o "$target"; then
+      echo "Fetched $path from ${repo}"
+      return 0
     fi
   done
+  return 1
+}
 
-  # Ensure critical files exist
-  for file in "update.sh" "requirements.txt"; do
+handle_directory() {
+  local dir=$1
+  tmp_extract="/tmp/libernet_extract_${RANDOM}"
+  mkdir -p "$tmp_extract"
+  
+  echo "Downloading missing ${dir}..."
+  curl -sL "${ORIGINAL_REPO}/archive/main.tar.gz" | \
+    tar -xz -C "$tmp_extract" "libernet-main/${dir}"
+  
+  mv "${tmp_extract}/libernet-main/${dir}" "${LIBERNET_TMP}/"
+  rm -rf "$tmp_extract"
+}
+
+verify_structure() {
+  echo "Verifying repository structure..."
+  
+  # Check directories
+  for dir in "${REQUIRED_DIRS[@]}"; do
+    if [ ! -d "${LIBERNET_TMP}/${dir}" ]; then
+      handle_directory "$dir"
+    fi
+  done
+  
+  # Check critical files
+  for file in "${REQUIRED_FILES[@]}"; do
     if [ ! -f "${LIBERNET_TMP}/${file}" ]; then
-      echo "Downloading missing ${file}..."
-      curl -sL "${ORIGINAL_REPO}/raw/main/${file}" -o "${LIBERNET_TMP}/${file}"
+      echo "Downloading ${file}..."
+      fetch_from_repo "$file" "${LIBERNET_TMP}/${file}"
     fi
   done
 }
 
 resolve_package_conflicts() {
-  # Handle dnsmasq/dnsmasq-full conflict
   if opkg list-installed | grep -q '^dnsmasq-full'; then
     sed -i '/^dnsmasq$/d' "${LIBERNET_TMP}/requirements.txt"
   else
@@ -53,6 +77,7 @@ resolve_package_conflicts() {
 install_dependencies() {
   echo "Installing dependencies..."
   opkg update
+  
   while IFS= read -r pkg; do
     [ -z "$pkg" ] && continue
     if ! opkg list-installed | grep -q "^${pkg} "; then
@@ -157,9 +182,9 @@ main() {
     }
   fi
 
-  # Verify and repair repository structure
+  # Verify and repair structure
   cd "${LIBERNET_TMP}"
-  verify_repo_structure
+  verify_structure
   resolve_package_conflicts
 
   # Installation steps
