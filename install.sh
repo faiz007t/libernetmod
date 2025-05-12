@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Hybrid Libernet Installer
-# Installs from faiz007t/libernetmod, auto-fixes missing dirs from lutfailham96/libernet
-# BusyBox tar compatible
+# Libernet Hybrid Installer (with config.json fix)
+# Installs from faiz007t/libernetmod, auto-fixes missing dirs/files from lutfailham96/libernet
+# Ensures system/config.json exists and LIBERNET_DIR is set for PHP
 
 set -eo pipefail
 
@@ -21,7 +21,7 @@ LIBERNET_TMP="${DOWNLOADS_DIR}/libernet"
 MOD_REPO="https://github.com/faiz007t/libernetmod"
 ORIG_REPO="https://github.com/lutfailham96/libernet"
 REQUIRED_DIRS=("bin" "web" "system" "log")
-REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt")
+REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt" "system/config.json")
 
 fetch_from_repo() {
   local repo="$1"
@@ -42,6 +42,18 @@ fetch_dir_from_orig() {
   rm -rf "${tmp_dir}"
 }
 
+fetch_file_from_orig() {
+  local file="$1"
+  local dir
+  dir=$(dirname "$file")
+  [ "$dir" = "." ] && dir=""
+  if [ -n "$dir" ] && [ ! -d "$dir" ]; then
+    mkdir -p "$dir"
+  fi
+  echo "Fetching missing ${file} from original repo..."
+  fetch_from_repo "$ORIG_REPO" "$file" "$file"
+}
+
 verify_and_fetch() {
   cd "${LIBERNET_TMP}"
   for dir in "${REQUIRED_DIRS[@]}"; do
@@ -51,10 +63,13 @@ verify_and_fetch() {
   done
   for file in "${REQUIRED_FILES[@]}"; do
     if [ ! -f "${file}" ]; then
-      echo "Fetching missing ${file} from original repo..."
-      fetch_from_repo "$ORIG_REPO" "$file" "$file"
+      fetch_file_from_orig "${file}"
     fi
   done
+  # If config.json is still missing, create a default one
+  if [ ! -f "system/config.json" ]; then
+    echo '{}' > system/config.json
+  fi
 }
 
 install_packages() {
@@ -116,6 +131,20 @@ configure_libernet_firewall() {
   fi
 }
 
+set_libernet_env() {
+  if ! grep -q LIBERNET_DIR /etc/profile; then
+    echo -e "\n# Libernet\nexport LIBERNET_DIR=${LIBERNET_DIR}" >> /etc/profile
+  fi
+  export LIBERNET_DIR="${LIBERNET_DIR}"
+}
+
+fix_permissions() {
+  # Make sure www-data (or httpd user) can read config.json and system dir
+  chown -R root:root "${LIBERNET_DIR}/system"
+  chmod 755 "${LIBERNET_DIR}/system"
+  chmod 644 "${LIBERNET_DIR}/system/config.json"
+}
+
 finish_install() {
   if command -v ip >/dev/null; then
     router_ip=$(ip -4 addr show br-lan | awk '/inet/ {print $2}' | cut -d/ -f1)
@@ -148,6 +177,9 @@ main_installer() {
   cp -af update.sh "${LIBERNET_DIR}/"
   cp -af bin system log "${LIBERNET_DIR}/"
   cp -af web/* "${LIBERNET_WWW}/"
+
+  set_libernet_env
+  fix_permissions
 
   # PHP configuration
   uci set uhttpd.main.interpreter='.php=/usr/bin/php-cgi'
