@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Libernet Installer with Full Authentication Removal and Friendly Completion Message
+# Libernet Installer with Full Authentication Removal and Completion Message
 
 set -eo pipefail
 
@@ -16,7 +16,6 @@ MOD_REPO="https://github.com/faiz007t/libernetmod"
 REQUIRED_DIRS=("bin" "web" "system" "log")
 REQUIRED_FILES=("update.sh" "requirements.txt" "binaries.txt" "packages.txt" "system/config.json")
 
-# ---- Core Functions ----
 handle_package_conflicts() {
     echo "=== Resolving Package Conflicts ==="
     if opkg list-installed | grep -q '^libnl-tiny '; then
@@ -140,17 +139,16 @@ configure_libernet_firewall() {
 
 remove_auth_checks() {
     echo "=== Removing Authentication System ==="
-    # Remove login-related files
     rm -f "${LIBERNET_WWW}/login.php" "${LIBERNET_WWW}/auth.php"
 
-    # Clean authentication checks from all PHP files
+    # Remove all auth checks from all PHP files
     find "${LIBERNET_WWW}" -type f -name "*.php" -exec sed -i \
         -e '/include[[:space:]]*(.\{0,1\}auth.php.\{0,1\});/d' \
         -e '/check_session[[:space:]]*(.*);/d' \
         -e '/header[[:space:]]*(.*login.php.*);/d' \
         {} \;
 
-    # Set dashboard as default page
+    # Set dashboard as default page if exists
     [ -f "${LIBERNET_WWW}/dashboard.php" ] && \
         ln -sf "dashboard.php" "${LIBERNET_WWW}/index.php"
 }
