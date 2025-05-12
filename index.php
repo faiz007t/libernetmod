@@ -115,7 +115,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.dns_resolver" :disabled="status === true" id="dns-resolver">
                                             <label class="form-check-label" for="dns-resolver">
-                                                <i class="fas fa-server"></i> DNS resolver
+                                                <span class="material-icons">dns</span> DNS resolver
                                             </label>
                                         </div>
                                     </div>
