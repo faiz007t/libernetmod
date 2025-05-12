@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Libernet Installer with Full Authentication Removal and Completion Message
+# Libernet Installer with Clear Step-by-Step Output and Authentication Removal
 
 set -eo pipefail
 
@@ -101,6 +101,8 @@ install_proprietary() {
             curl -sL "https://github.com/lutfailham96/libernet-proprietary/raw/main/${ARCH}/binaries/${binary}" \
                 -o "/usr/bin/${binary}"
             chmod +x "/usr/bin/${binary}"
+        else
+            echo "Package ${binary} already installed."
         fi
     done < "${LIBERNET_TMP}/binaries.txt"
     while IFS= read -r pkg; do
@@ -112,6 +114,8 @@ install_proprietary() {
                 -o "$tmp_pkg"
             opkg install "$tmp_pkg"
             rm -f "$tmp_pkg"
+        else
+            echo "Package ${pkg} already installed."
         fi
     done < "${LIBERNET_TMP}/packages.txt"
 }
@@ -140,15 +144,11 @@ configure_libernet_firewall() {
 remove_auth_checks() {
     echo "=== Removing Authentication System ==="
     rm -f "${LIBERNET_WWW}/login.php" "${LIBERNET_WWW}/auth.php"
-
-    # Remove all auth checks from all PHP files
     find "${LIBERNET_WWW}" -type f -name "*.php" -exec sed -i \
         -e '/include[[:space:]]*(.\{0,1\}auth.php.\{0,1\});/d' \
         -e '/check_session[[:space:]]*(.*);/d' \
         -e '/header[[:space:]]*(.*login.php.*);/d' \
         {} \;
-
-    # Set dashboard as default page if exists
     [ -f "${LIBERNET_WWW}/dashboard.php" ] && \
         ln -sf "dashboard.php" "${LIBERNET_WWW}/index.php"
 }
@@ -160,12 +160,13 @@ finish_install() {
         router_ip=$(ifconfig br-lan 2>/dev/null | awk '/inet addr/ {print $2}' | cut -d: -f2)
     fi
 
+    echo ""
     echo "========================================"
-    echo " Libernet Installation Complete!"
-    echo " Access: http://${router_ip}/libernet"
-    echo " Username: admin"
-    echo " Password: libernet"
-    echo " Installed: $(date +'%Y-%m-%d %H:%M:%S')"
+    echo "Libernet Installation Complete!"
+    echo "Access: http://${router_ip}/libernet"
+    echo "Username: admin"
+    echo "Password: libernet"
+    echo "Installed: $(date +'%Y-%m-%d %H:%M:%S')"
     echo "========================================"
 }
 
@@ -189,7 +190,6 @@ main_installation() {
     install_dependencies
     install_proprietary
 
-    # Deploy files
     echo "=== Deploying Libernet ==="
     mkdir -p "${LIBERNET_DIR}" "${LIBERNET_WWW}"
     cp -af bin system log "${LIBERNET_DIR}/"
