@@ -1,4 +1,4 @@
-[url=https://freeimage.host/i/3809cPV][img]https://iili.io/3809cPV.md.jpg[/img][/url]
+<a href="https://freeimage.host/i/3809cPV"><img src="https://iili.io/3809cPV.md.jpg" alt="3809cPV.md.jpg" border="0"></a>
 
 # Libernet Mod
 Libernet is open source web app for tunneling internet using SSH, V2Ray, Trojan, Shadowsocks, OpenVPN on OpenWRT with ease.
