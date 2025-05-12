@@ -21,9 +21,8 @@ handle_package_conflicts() {
     # Remove standard dnsmasq if present to avoid conflict with dnsmasq-full
     if opkg list-installed | grep -q '^dnsmasq '; then
         echo "Removing dnsmasq to prevent conflicts with dnsmasq-full..."
-        opkg remove dnsmasq
+        opkg remove --force-removal-of-dependent-packages dnsmasq
     fi
-    # Do NOT add or remove dnsmasq-full in requirements.txt; user handles it
     # Remove libnl-tiny if present
     if opkg list-installed | grep -q '^libnl-tiny '; then
         echo "Removing conflicting libnl-tiny..."
