@@ -1,4 +1,4 @@
-<footer class="text-center" style="background-color: #555; padding: 16px;">
+<footer class="text-center" style="background-color: #555;">
   <span style="color: white;">
     © 2025 
     <a href="https://github.com/faiz007t/libernetmod" rel="noopener noreferrer" style="color: #bdbdbd;">
