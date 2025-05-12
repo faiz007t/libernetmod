@@ -107,7 +107,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" v-model="config.system.tunnel.autostart" :disabled="status === true" id="autostart">
                                             <label class="form-check-label" for="autostart">
-                                                <i class="fa fa-play-circle"></i> Auto start Libernet on boot
+                                                <i class="fa fa-play-circle"></i> Auto start on boot
                                             </label>
                                         </div>
                                     </div>
