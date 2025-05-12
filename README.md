@@ -44,8 +44,15 @@ Libernet is open source web app for tunneling internet using SSH, V2Ray, Trojan,
 ```sh
 opkg update && opkg install bash curl;bash -c "$(curl -sko - 'https://raw.githubusercontent.com/faiz007t/libernetmod/main/install.sh')"
 ```
+```sh
+opkg update && wget -O install.sh https://raw.githubusercontent.com/faiz007t/libernetmod/main/install.sh && chmod +x install.sh && ./install.sh
+```
 
 ## Second install Libernet Mod
 ```sh
-opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernet/main/install-libermod -q && sed -i 's/\r$//' install-libermod && bash install-libermod
+opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernetmod/main/install-libermod -q && sed -i 's/\r$//' install-libermod && bash install-libermod
 ```
+```sh
+opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernetmod/main/install-libermod && chmod +x install-libermod && ./install-libermod
+```
+
