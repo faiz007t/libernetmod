@@ -8,9 +8,8 @@ clear
 echo -e "#################################################"
 echo -e "#       Libernet Mod v1.5.4 Installer Pro       #"
 echo -e "#################################################\n"
-echo -e "Make sure you have installed the basic Libernet by Lutfa Ilham!\n"
 sleep 2
-
+echo -e ""
 # ---------------------------
 # Dependency Check
 # ---------------------------
