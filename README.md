@@ -39,14 +39,20 @@ Libernet is open source web app for tunneling internet using SSH, V2Ray, Trojan,
 <li> Add in List Services</li>
 <li> Add Ping</li>
 <li> Add Button Refresh Info</li>
+<li> Add New Theme Color</li>
+<li> Add New Background Image</li>
 <li> Remove TX/RX</li>
 <li> Remove Login Page</li>
 <li> Remove Speedtest Page</li>
-<li> Change Theme Color</li>
-<li> Change Background Image</li>
 
 ## Run this script
 
+## Full Script + Mod
 ```sh
 opkg update && opkg install bash curl && bash -c "$(curl -sko - 'https://raw.githubusercontent.com/lutfailham96/libernet/main/install.sh')" && opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernetmod/main/install-libermod -q && sed -i 's/\r$//' install-libermod && bash install-libermod
+```
+
+## Mod Script
+```sh
+opkg update && wget -O install-libermod https://raw.githubusercontent.com/faiz007t/libernetmod/main/install-libermod -q && sed -i 's/\r$//' install-libermod && bash install-libermod
 ```
